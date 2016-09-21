@@ -1,0 +1,82 @@
+
+**************************************************************************
+Program: persons_ward.sas
+Library: DCOLA
+Project: Latino Databook
+Author: Lesley Freiman
+Created: 06/01/2009
+Modified: 06/02/2009
+Version: SAS 9.1
+Environment: Windows with SAS/Connect
+Description: Number of people by Race by Ward, 1980
+			 standardized to 2000 census tracts/2002wards
+Modifications:
+
+**************************************************************************/;
+
+
+%include "K:\Metro\PTatian\DCData\SAS\Inc\Stdhead.sas";
+%include "K:\Metro\PTatian\DCData\SAS\Inc\AlphaSignon.sas" /nosource2;
+
+
+*/ Defines libraries /*;
+%DCData_lib( Ncdb );
+%DCData_lib( DCOLA );
+%DCData_lib( General );
+
+
+rsubmit;
+
+*/creates a file by race and age on alpha - temp */;
+data ncdb80_race; 
+set ncdb.Ncdb_1980_2000_dc  (keep= geo2000 
+		shr8d  shrhsp8n shrnhb8n shrnhj8n shrnhw8n 
+		); 
+	run;
+
+data ola_1980_race;
+set ncdb80_race;
+    latino = shrhsp8n; 
+	white = shrnhw8n;
+	black = shrnhb8n;
+	other = shrnhj8n;
+	denom = shr8d;
+	drop shr8d  shrhsp8n shrnhb8n shrnhj8n shrnhw8n; 
+	run;
+/* transforms tracts to wards */;
+
+%Transform_geo_data(
+    dat_ds_name = ola_1980_race,
+    dat_org_geo = geo2000, 
+
+	dat_count_vars = /*yr 2000 vars*/ latino white black other denom,
+
+	wgt_ds_name = general.wt_tr00_ward02,
+	wgt_org_geo=geo2000,
+	wgt_new_geo=ward2002,
+    wgt_wgt_var = popwt,
+	
+    out_ds_name = persons_ward_1980,
+    out_ds_label = DC residents by race by ward   
+  );
+run;
+
+
+proc download inlib=work outlib=dcola; 
+select persons_ward_1980; 
+run;
+
+endrsubmit;
+
+
+
+
+
+filename fexport "D:\DCDATA\Libraries\DCOLA\Raw\persons_ward_1980.csv" lrecl=2000;
+proc export data=dcola.persons_ward_1980
+	outfile=fexport 
+	dbms=csv replace;
+	run;
+
+	filename fexport clear;
+	run;
