@@ -30,7 +30,6 @@
 %do i = 1 %to 3; 
   %let geo=%scan(&geography., &i., " "); 
 
-
     %local geosuf geoafmt j; 
 
   %let geosuf = %sysfunc( putc( %upcase( &geo ), $geosuf. ) );
@@ -38,17 +37,19 @@
 
 data dcola.sol2017;
 	merge
-	Ncdb.Ncdb_sum&geosuf
-        (keep=&geo
-           TotPop: PopWithRace: PopBlackNonHispBridge:
-           PopWhiteNonHispBridge: PopHisp: PopAsianPINonHispBridge:
-           PopOtherRaceNonHispBridge: NumOwnerOccHsgUnits:)
+		Ncdb.Ncdb_sum&geosuf
+	        (keep=&geo
+	           TotPop: PopWithRace: PopBlackNonHispBridge:
+	           PopWhiteNonHispBridge: PopHisp: PopAsianPINonHispBridge:
+	           PopOtherRaceNonHispBridge: NumOwnerOccHsgUnits:)
 
-      Ncdb.Ncdb_sum_2010&geosuf
-        (keep=&geo
-           TotPop: PopWithRace: PopBlackNonHispBridge:
-           PopWhiteNonHispBridge: PopHisp: PopAsianPINonHispBridge:
-           PopOtherRaceNonHispBridge: )
+      	Ncdb.Ncdb_lf_2000_dc
+	        (keep=&geo
+	           trctpop0 forbczn0 forbnoc0
+				educ110 aedlths0 bedlths0 hedlths0 iedlths0 medlths0 oedlths0 xedlths0
+				)
+
+		acs.
 
 		equity.acs_2010_14_dc_sum_bg&geosuf
 			(keep=TotPop: mTotPop: 
@@ -87,6 +88,8 @@ data dcola.sol2017;
 			   PopUnder18YearsH: mPopUnder18YearsH: 
 			   Pop18_34YearsH: mPop18_34YearsH:
 			   Pop35_64YearsH: mPop35_64YearsH:
+			   Pop25_64years: mPop25_64years:
+			   Pop25_64yearsH: mPop25_64yearsH:
 			   Pop65andOverYearsH: mPop65andOverYearsH:
 			   Pop25andOverYearsH: mPop25andOverYearsH: 
 			   PopWithRace: mPopWithRace:
@@ -163,41 +166,41 @@ data dcola.sol2017;
 
     ** Population by Race/Ethnicity **;
     
-    %Pct_calc( var=PctBlackNonHispBridge, label=% black non-Hispanic, num=PopBlackNonHispBridge, den=PopWithRace, years=1990 2000 2010_14 2010 )
-    %Pct_calc( var=PctWhiteNonHispBridge, label=% white non-Hispanic, num=PopWhiteNonHispBridge, den=PopWithRace, years=1990 2000 2010_14 2010 )
-    %Pct_calc( var=PctHisp, label=% Hispanic, num=PopHisp, den=PopWithRace, years=1990 2000 2010_14 2010 )
-    %Pct_calc( var=PctAsnPINonHispBridge, label=% Asian/P.I. non-Hispanic, num=PopAsianPINonHispBridge, den=PopWithRace, years=1990 2000 2010_14 2010 )
+    %Pct_calc( var=PctBlackNonHispBridge, label=% black non-Hispanic, num=PopBlackNonHispBridge, den=PopWithRace, years=1990 2000 2010_14 )
+    %Pct_calc( var=PctWhiteNonHispBridge, label=% white non-Hispanic, num=PopWhiteNonHispBridge, den=PopWithRace, years=1990 2000 2010_14 )
+    %Pct_calc( var=PctHisp, label=% Hispanic, num=PopHisp, den=PopWithRace, years=1990 2000 2010_14 )
+    %Pct_calc( var=PctAsnPINonHispBridge, label=% Asian/P.I. non-Hispanic, num=PopAsianPINonHispBridge, den=PopWithRace, years=1990 2000 2010_14 )
     %Pct_calc( var=PctOtherRaceNonHispBridg, label=% All other than Black White Asian P.I. Hispanic, num=PopOtherRaceNonHispBridg, den=PopWithRace, years=1990 2000 2010_14 2010 )
 
 *Latino population by country of origin, 2010-2014; 
 
-    %Pct_calc( var=PctHispMexican, label=% Mexican, num=PopHispMexican, den=PopHisp, years=1990 2000 2010 2010_14  )
-	%Pct_calc( var=PctHispPuertoRican, label=% Puerto Rican, num=PopHispPuertoRican, den=PopHisp, years=1990 2000 2010 2010_14  )
-	%Pct_calc( var=PctHispCuban, label=% Cuban, num=PopHispCuban, den=PopHisp, years=1990 2000 2010 2010_14  )
-	%Pct_calc( var=PctHispDominican, label=% Dominican, num=PopHispDominican, den=PopHisp, years=1990 2000 2010 2010_14  )
-	%Pct_calc( var=PctHispOtherCentAmer, label=% Central American, num=PopHispOtherCentAmer, den=PopHisp, years=1990 2000 2010 2010_14  )
-	%Pct_calc( var=PctHispSouthAmerican, label=% South American, num=PopHispOtherSouthAmer, den=PopHisp, years=1990 2000 2010 2010_14  )
-	%Pct_calc( var=PctHispOtherHispOrig, label=% Other Hispanic or Latino, num=PopHispOtherHisp, den=PopHisp, years=1990 2000 2010 2010_14 )
-    %Pct_calc( var=PctHispArgentinian, label=% Argentinian, num=PopHispArgentinian, den=PopHisp, years=1990 2000 2010 2010_14  )
-    %Pct_calc( var=PctHispBolivian, label=% Bolivian, num=PopHispBolivian, den=PopHisp, years=1990 2000 2010 2010_14  )
-    %Pct_calc( var=PctHispChilean, label=% Chilean, num=PopHispChilean, den=PopHisp, years=1990 2000 2010 2010_14  )
-    %Pct_calc( var=PctHispColombian, label=% Colombian, num=PopHispColombian, den=PopHisp, years=1990 2000 2010 2010_14  )
-    %Pct_calc( var=PctHispCosta Rican, label=% Costa Rican, num=PopHispCosta Rican, den=PopHisp, years=1990 2000 2010 2010_14  )
-    %Pct_calc( var=PctHispEcuadorian, label=% Ecuadorian, num=PopHispEcuadorian, den=PopHisp, years=1990 2000 2010 2010_14  )
-    %Pct_calc( var=PctHispElSalvadoran, label=% ElSalvadoran, num=PopHispElSalvadoran, den=PopHisp, years=1990 2000 2010 2010_14  )
-    %Pct_calc( var=PctHispGuatemalan, label=% Guatemalan, num=PopHispGuatemalan, den=PopHisp, years=1990 2000 2010 2010_14  )
-    %Pct_calc( var=PctHispHonduran, label=% Honduran, num=PopHispHonduran, den=PopHisp, years=1990 2000 2010 2010_14  )
-    %Pct_calc( var=PctHispNicaraguan, label=% Nicaraguan, num=PopHispNicaraguan, den=PopHisp, years=1990 2000 2010 2010_14  )
-    %Pct_calc( var=PctHispPeruvian, label=% Peruvian, num=PopHispPeruvian, den=PopHisp, years=1990 2000 2010 2010_14  )
-    %Pct_calc( var=PctHispPananamian, label=% Pananamian, num=PopHispPananamian, den=PopHisp, years=1990 2000 2010 2010_14  )
+    %Pct_calc( var=PctHispMexican, label=% Mexican, num=PopHispMexican, den=PopHisp, years=1990 2000 2010_14  )
+	%Pct_calc( var=PctHispPuertoRican, label=% Puerto Rican, num=PopHispPuertoRican, den=PopHisp, years=1990 2000 2010_14  )
+	%Pct_calc( var=PctHispCuban, label=% Cuban, num=PopHispCuban, den=PopHisp, years=1990 2000 2010_14 )
+	%Pct_calc( var=PctHispDominican, label=% Dominican, num=PopHispDominican, den=PopHisp, years=1990 2000 2010_14 )
+	%Pct_calc( var=PctHispOtherCentAmer, label=% Central American, num=PopHispOtherCentAmer, den=PopHisp, years=1990 2000 2010_14 )
+	%Pct_calc( var=PctHispSouthAmerican, label=% South American, num=PopHispOtherSouthAmer, den=PopHisp, years=1990 2000 2010_14 )
+	%Pct_calc( var=PctHispOtherHispOrig, label=% Other Hispanic or Latino, num=PopHispOtherHisp, den=PopHisp, years=1990 2000 2010_14)
+    %Pct_calc( var=PctHispArgentinian, label=% Argentinian, num=PopHispArgentinian, den=PopHisp, years=1990 2000 2010_14 )
+    %Pct_calc( var=PctHispBolivian, label=% Bolivian, num=PopHispBolivian, den=PopHisp, years=1990 2000 2010_14 )
+    %Pct_calc( var=PctHispChilean, label=% Chilean, num=PopHispChilean, den=PopHisp, years=1990 2000 2010_14 )
+    %Pct_calc( var=PctHispColombian, label=% Colombian, num=PopHispColombian, den=PopHisp, years=1990 2000 2010_14 )
+    %Pct_calc( var=PctHispCosta Rican, label=% Costa Rican, num=PopHispCosta Rican, den=PopHisp, years=1990 2000 2010_14 )
+    %Pct_calc( var=PctHispEcuadorian, label=% Ecuadorian, num=PopHispEcuadorian, den=PopHisp, years=1990 2000 2010_14 )
+    %Pct_calc( var=PctHispElSalvadoran, label=% ElSalvadoran, num=PopHispElSalvadoran, den=PopHisp, years=1990 2000 2010_14 )
+    %Pct_calc( var=PctHispGuatemalan, label=% Guatemalan, num=PopHispGuatemalan, den=PopHisp, years=1990 2000 2010_14 )
+    %Pct_calc( var=PctHispHonduran, label=% Honduran, num=PopHispHonduran, den=PopHisp, years=1990 2000 2010_14 )
+    %Pct_calc( var=PctHispNicaraguan, label=% Nicaraguan, num=PopHispNicaraguan, den=PopHisp, years=1990 2000 2010_14 )
+    %Pct_calc( var=PctHispPeruvian, label=% Peruvian, num=PopHispPeruvian, den=PopHisp, years=1990 2000 2010_14 )
+    %Pct_calc( var=PctHispPananamian, label=% Pananamian, num=PopHispPananamian, den=PopHisp, years=1990 2000 2010_14 )
 
 *Latino population by citizenship status, 2010-2014;
 
 	%Pct_calc( var=PctNativeBornH, label=% Native-born Hispanic, num=PopNativeBornH, den=PopHisp, years=2010_14 )
 	%Pct_calc( var=PctForeignBornH, label=% Foreign-born Hispanic, num=PopForeignBornH, den=PopHisp, years=2010_14 )
 	%Pct_calc( var=PctCitizenH, label=% Naturalized and native born Hispanic citizens, num=PopCitizenH, den=PopHisp, years=2010_14 )
-	%Pct_calc( var=PctNaturalizedH, label=% Naturalized Hispanic citizens, num=PopNaturalizedH, den=PopHisp, years=2010_14 )
-	%Pct_calc( var=PctNonCitizenH, label=% Hispanic not US citizens, num=PopNonCitizenH, den=PopHisp, years=2010_14 )
+	%Pct_calc( var=PctNaturalizedH, label=% Naturalized foreign-born Hispanic citizens, num=PopNaturalizedH, den=PopHisp, years=2010_14 )
+	%Pct_calc( var=PctNonCitizenH, label=% Hispanic foreign-born population who are not US citizens, num=PopNonCitizenH, den=PopHisp, years=2010_14 )
 
 	%Moe_prop_a( var=PctNativeBornH_m_2010_14, mult=100, num=PopNativeBornH_2010_14, den=PopHisp_2010_14, 
                        num_moe=mPopNativeBornH_2010_14, den_moe=mPopHisp_2010_14 );
@@ -213,6 +216,9 @@ data dcola.sol2017;
 
 	%Moe_prop_a( var=PctNonCitizenH_m_2010_14, mult=100, num=PopNonCitizenH_2010_14, den=PopHisp_2010_14, 
                        num_moe=mNonCitizenH_2010_14, den_moe=mPopHisp_2010_14 );
+
+
+
 
 *Latino population by language proficiency, 2010-2014;
 
@@ -255,25 +261,48 @@ data dcola.sol2017;
 
 *Latino population by age, 2010-2014;
 
-    %Pct_calc( var=PctPopUnder18YearsH, label=% children &name., num=PopUnder18YearsH, den=PopAloneH, years= 2010_14 )
+	%Pct_calc( var=PctPopUnder18Years, label=% children &name., num=PopUnder18Years, den=PopHisp, years= 2010_14 )
     
-    %Moe_prop_a( var=PctPopUnder18YearsH_m_2010_14, mult=100, num=PopUnder18YearsH_2010_14, den=PopAloneH_2010_14, 
-                       num_moe=mPopUnder18YearsH_2010_14, den_moe=mPopAloneH_2010_14 );
+    %Moe_prop_a( var=PctPopUnder18Years_m_2010_14, mult=100, num=PopUnder18Years_2010_14, den=PopWithRace_2010_14, 
+                       num_moe=mPopUnder18Years_2010_14, den_moe=mPopWithRace_2010_14 );
 
-	%Pct_calc( var=PctPop18_34YearsH, label=% persons 18-34 years old &name., num=Pop18_34YearsH, den=PopAloneH, years= 2010_14 )
+    %Pct_calc( var=PctPopUnder18YearsH, label=% children &name., num=PopUnder18YearsH, den=PopHisp, years= 2010_14 )
+    
+    %Moe_prop_a( var=PctPopUnder18YearsH_m_2010_14, mult=100, num=PopUnder18YearsH_2010_14, den=PopHisp_2010_14, 
+                       num_moe=mPopUnder18YearsH_2010_14, den_moe=mPopHisp_2010_14 );
+
+
+	%Pct_calc( var=PctPop18_34Years, label=% persons 18-34 years old &name., num=Pop18_34Years, den=PopWithRace, years= 2010_14 )
 	
-	%Moe_prop_a( var=PctPop18_34YearsH_m_2010_14, mult=100, num=Pop18_34YearsH_2010_14, den=PopAloneH_2010_14, 
-	                       num_moe=mPop18_34YearsH_2010_14, den_moe=mPopAloneH_2010_14 );
+	%Moe_prop_a( var=PctPop18_34Years_m_2010_14, mult=100, num=Pop18_34Years_2010_14, den=PopWithRace_2010_14, 
+	                       num_moe=mPop18_34Years_2010_14, den_moe=mPopWithRace_2010_14 );
 
-	%Pct_calc( var=PctPop35_64YearsH, label=% persons 35-64 years old &name., num=Pop35_64YearsH, den=PopAloneH, years= 2010_14 )
+	%Pct_calc( var=PctPop18_34YearsH, label=% persons 18-34 years old &name., num=Pop18_34YearsH, den=PopHisp, years= 2010_14 )
 	
-	%Moe_prop_a( var=PctPop35_64YearsH_m_2010_14, mult=100, num=Pop35_64YearsH_2010_14, den=PopAloneH_2010_14, 
-	                       num_moe=mPop35_64YearsH_2010_14, den_moe=mPopAloneH_2010_14 );
+	%Moe_prop_a( var=PctPop18_34YearsH_m_2010_14, mult=100, num=Pop18_34YearsH_2010_14, den=PopHisp_2010_14, 
+	                       num_moe=mPop18_34YearsH_2010_14, den_moe=mPopHisp_2010_14 );
 
-	%Pct_calc( var=PctPop65andOverYearsH, label=% seniors &name., num=Pop65andOverYearsH, den=PopAloneH, years= 2010_14 )
 
-    %Moe_prop_a( var=PctPop65andOverYrsH_m_2010_14, mult=100, num=Pop65andOverYearsH_2010_14, den=PopAloneH_2010_14, 
-                       num_moe=mPop65andOverYearsH_2010_14, den_moe=mPopAloneH_2010_14 );
+	%Pct_calc( var=PctPop35_64Years, label=% persons 35-64 years old &name., num=Pop35_64Years, den=PopWithRace, years= 2010_14 )
+	
+	%Moe_prop_a( var=PctPop35_64Years_m_2010_14, mult=100, num=Pop35_64Years_2010_14, den=PopWithRace_2010_14, 
+	                       num_moe=mPop35_64Years_2010_14, den_moe=mPopWithRace_2010_14 );
+
+	%Pct_calc( var=PctPop35_64YearsH, label=% persons 35-64 years old &name., num=Pop35_64YearsH, den=PopHisp, years= 2010_14 )
+	
+	%Moe_prop_a( var=PctPop35_64YearsH_m_2010_14, mult=100, num=Pop35_64YearsH_2010_14, den=PopHisp_2010_14, 
+	                       num_moe=mPop35_64YearsH_2010_14, den_moe=mPopHisp_2010_14 );
+
+
+	%Pct_calc( var=PctPop65andOverYears, label=% seniors &name., num=Pop65andOverYears, den=PopWithRace, years= 2010_14 )
+
+    %Moe_prop_a( var=PctPop65andOverYrs_m_2010_14, mult=100, num=Pop65andOverYears_2010_14, den=PopWithRace_2010_14, 
+                       num_moe=mPop65andOverYears_2010_14, den_moe=mPopWithRace_2010_14 );
+
+	%Pct_calc( var=PctPop65andOverYearsH, label=% seniors &name., num=Pop65andOverYearsH, den=PopHisp, years= 2010_14 )
+
+    %Moe_prop_a( var=PctPop65andOverYrsH_m_2010_14, mult=100, num=Pop65andOverYearsH_2010_14, den=PopHisp_2010_14, 
+                       num_moe=mPop65andOverYearsH_2010_14, den_moe=mPopHisp_2010_14 );
 
 	    ** Total births **;
     
@@ -304,6 +333,26 @@ data dcola.sol2017;
 
 	    ** Jobs and economic opportunity, 2014**;
 
+	%Pct_calc( var=PctUnemployed, label=Unemployment rate (%), num=PopUnemployed, den=PopInCivLaborForce, years=2010_14 )
+
+	%Moe_prop_a( var=PctUnemployed_m_2010_14, mult=100, num=PopUnemployed_2010_14, den=PopInCivLaborForce_2010_14, 
+	                       num_moe=mPopUnemployed_2010_14, den_moe=mPopInCivLaborForce_2010_14 );
+
+    %Pct_calc( var=Pct25andOverWoutHS, label=% persons without HS diploma, num=Pop25andOverWoutHS, den=Pop25andOverYears, years=2010_14 )
+
+    %Moe_prop_a( var=Pct25andOverWoutHS_m_2010_14, mult=100, num=Pop25andOverWoutHS_2010_14, den=Pop25andOverYears_2010_14, 
+                       num_moe=mPop25andOverWoutHS_2010_14, den_moe=mPop25andOverYears_2010_14 );
+
+	%Pct_calc( var=Pct25andOverWHS, label=% persons with HS diploma, num=Pop25andOverWHS, den=Pop25andOverYears, years=2010_14 )
+
+    %Moe_prop_a( var=Pct25andOverWHS_m_2010_14, mult=100, num=Pop25andOverWHS_2010_14, den=Pop25andOverYears_2010_14, 
+                       num_moe=mPop25andOverWHS_2010_14, den_moe=mPop25andOverYears_2010_14 );
+
+	%Pct_calc( var=Pct25andOverWSC, label=% persons  with some college, num=Pop25andOverWSC, den=Pop25andOverYears, years=2010_14 )
+
+	%Moe_prop_a( var=Pct25andOverWSC_m_2010_14, mult=100, num=Pop25andOverWSC_2010_14, den=Pop25andOverYears_2010_14, 
+                       num_moe=mPop25andOverWSC_2010_14, den_moe=mPop25andOverYears_2010_14 );
+
 	%do r=1 %to 4;
 
 		%let race=%scan(&racelist.,&r.," ");
@@ -331,27 +380,27 @@ data dcola.sol2017;
 
 	%end;
 
-	%Pct_calc( var=PctEmployedMngmtH, label=&name. Unemployment rate (%), num=PopEmployedMngmtH, den=PopEmployedByOccH, years=2010_14 )
+	%Pct_calc( var=PctEmployedMngmtH, label=Hispanic persons employed in management, business, science and arts occupations, num=PopEmployedMngmtH, den=PopEmployedByOccH, years=2010_14 )
 
 	%Moe_prop_a( var=PctEmployedMngmtH_m_2010_14, mult=100, num=PopEmployedMngmtH_2010_14, den=PopEmployedByOccH_2010_14, 
 	                       num_moe=mPopEmployedMngmtH_2010_14, den_moe=mPopEmployedByOccH_2010_14 );
 
-	%Pct_calc( var=PctEmployedServH, label=&name. Unemployment rate (%), num=PopEmployedServH, den=PopEmployedByOccH, years=2010_14 )
+	%Pct_calc( var=PctEmployedServH, label=Hispanic persons employed in service occupations, num=PopEmployedServH, den=PopEmployedByOccH, years=2010_14 )
 
 	%Moe_prop_a( var=PctEmployedServH_m_2010_14, mult=100, num=PopEmployedServH_2010_14, den=PopEmployedByOccH_2010_14, 
 	                       num_moe=mPopEmployedServH_2010_14, den_moe=mPopEmployedByOccH_2010_14 );
 
-	%Pct_calc( var=PctEmployedSalesH, label=&name. Unemployment rate (%), num=PopEmployedSalesH, den=PopEmployedByOccH, years=2010_14 )
+	%Pct_calc( var=PctEmployedSalesH, label=Hispanic persons employed in sales and office occupations, num=PopEmployedSalesH, den=PopEmployedByOccH, years=2010_14 )
 
 	%Moe_prop_a( var=PctEmployedSalesH_m_2010_14, mult=100, num=PopEmployedSalesH_2010_14, den=PopEmployedByOccH_2010_14, 
 	                       num_moe=mPopEmployedSalesH_2010_14, den_moe=mPopEmployedByOccH_2010_14 );
 	
-	%Pct_calc( var=PctEmployedNatResH, label=&name. Unemployment rate (%), num=PopEmployedNatResH, den=PopEmployedByOccH, years=2010_14 )
+	%Pct_calc( var=PctEmployedNatResH, label=Hispanic persons employed in natural resources, construction, and maintenance occupations, num=PopEmployedNatResH, den=PopEmployedByOccH, years=2010_14 )
 
 	%Moe_prop_a( var=PctEmployedNatResH_m_2010_14, mult=100, num=PopEmployedNatResH_2010_14, den=PopEmployedByOccH_2010_14, 
 	                       num_moe=mPopEmployedNatResH_2010_14, den_moe=mPopEmployedByOccH_2010_14 );
 
-	%Pct_calc( var=PctEmployedProdH, label=&name. Unemployment rate (%), num=PopEmployedProdH, den=PopEmployedByOccH, years=2010_14 )
+	%Pct_calc( var=PctEmployedProdH, label=Hispanic persons employed in production, transportation, and material moving occupations, num=PopEmployedProdH, den=PopEmployedByOccH, years=2010_14 )
 
 	%Moe_prop_a( var=PctEmployedProdH_m_2010_14, mult=100, num=PopEmployedProdH_2010_14, den=PopEmployedByOccH_2010_14, 
 	                       num_moe=mPopEmployedProdH_2010_14, den_moe=mPopEmployedByOccH_2010_14 );
@@ -363,6 +412,11 @@ data dcola.sol2017;
 
 	    ** Housing **;    
 
+	%Pct_calc( var=PctOwnerOccupiedHU, label=Homeownership rate &name.(%), num=NumOwnerOccupiedHU, den=NumOccupiedHsgUnits, years=2010_14 )
+
+    %Moe_prop_a( var=PctOwnerOccupiedHU_m_2010_14, mult=100, num=NumOwnerOccupiedHU_2010_14, den=NumOccupiedHsgUnits_2010_14, 
+                       num_moe=mNumOwnerOccupiedHU_2010_14, den_moe=mNumOccupiedHsgUnits_2010_14 );
+
 	%do r=1 %to 4;
 
 		%let race=%scan(&racelist.,&r.," ");
@@ -370,12 +424,12 @@ data dcola.sol2017;
 
     %Pct_calc( var=PctOwnerOccupiedHU&race., label=Homeownership rate &name.(%), num=NumOwnerOccupiedHU&race., den=NumOccupiedHsgUnits&race., years=2010_14 )
 
-    
     %Moe_prop_a( var=PctOwnerOccupiedHU&race._m_2010_14, mult=100, num=NumOwnerOccupiedHU&race._2010_14, den=NumOccupiedHsgUnits&race._2010_14, 
                        num_moe=mNumOwnerOccupiedHU&race._2010_14, den_moe=mNumOccupiedHsgUnits&race._2010_14 );
     
    	%end;
 
+    %Pct_calc( var=PctOwnerOccHsgUnits, label=Homeownership rate (%), num=NumOwnerOccHsgUnits, den=NumOccupiedHsgUnits, years=2000 )
     %Pct_calc( var=PctOwnerOccHsgUnitsAsianPI, label=Homeownership rate Asian PI(%), num=NumOwnerOccHsgUnitsAsianPI, den=NumOccupiedHsgUnitsAsianPI, years=2000 )
     %Pct_calc( var=PctOwnerOccHsgUnitsBlack, label=Homeownership rate Black(%), num=NumOwnerOccHsgUnitsBlack, den=NumOccupiedHsgUnitsBlack, years=2000 )
     %Pct_calc( var=PctOwnerOccHsgUnitsHisp, label=Homeownership rate Hispanic(%), num=NumOwnerOccHsgUnitsHisp, den=NumOccupiedHsgUnitsHisp, years=2000 )

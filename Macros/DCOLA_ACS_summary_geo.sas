@@ -129,6 +129,8 @@
 
 		   mPopUnder18Years_&_years. mPopUnder18YearsH_&_years.
 	
+		   mPop18_24Years_&_years. mPop18_24YearsH_&_years.
+
 		   mPop18_34Years_&_years. mPop18_34YearsH_&_years.
 
 		   mPop35_64Years_&_years. mPop35_64YearsH_&_years.

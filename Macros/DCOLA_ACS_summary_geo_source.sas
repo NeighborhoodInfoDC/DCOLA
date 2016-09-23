@@ -81,6 +81,10 @@
 		sum( B01001e3, B01001e4, B01001e5, B01001e6, 
              B01001e27, B01001e28, B01001e29, B01001e30 );
 
+	Pop18_24Years_&_years. = 
+		sum(B01001e7, B01001e8, B01001e9, B01001e10,
+			B01001e31, B01001e32, B01001e33, B01001e34 );
+
 	Pop18_34Years_&_years. = 
 		sum(B01001e7, B01001e8, B01001e9, B01001e10, B01001e11, B01001e12, 
 			B01001e31, B01001e32, B01001e33, B01001e34, B01001e35, B01001e36 );
@@ -105,6 +109,10 @@
       %moe_sum( var=B01001m3 B01001m4 B01001m5 B01001m6 
            			B01001m27 B01001m28 B01001m29 B01001m30 );
 
+	mPop18_24Years_&_years.	 = 
+		%moe_sum( var=B01001m7 B01001m8 B01001m9 B01001m10 
+					  B01001m31 B01001m32 B01001m33 B01001m34 );
+
 	mPop18_34Years_&_years.	 = 
 		%moe_sum( var=B01001m7 B01001m8 B01001m9 B01001m10 B01001m11 B01001m12 
 					  B01001m31 B01001m32 B01001m33 B01001m34 B01001m35 B01001m36 );
@@ -123,6 +131,7 @@
       NumFamilies_&_years. = "Family HHs, &_years_dash "
       PopUnder5Years_&_years. = "Persons under 5 years old, &_years_dash "
 	  PopUnder18Years_&_years. = "Persons under 18 years old, &_years_dash "
+	  Pop18_24Years_&_years. = "Persons 18-24 years old, &_years_dash "
 	  Pop18_34Years_&_years. = "Persons 18-34 years old, &_years_dash "
 	  Pop35_64Years_&_years. = "Persons 35-64 years old, &_years_dash "
 	  Pop65andOverYears_&_years. = "Persons 65 years old and over, &_years_dash "
@@ -131,6 +140,7 @@
       mNumFamilies_&_years. = "Family HHs, MOE, &_years_dash "
       mPopUnder5Years_&_years. = "Persons under 5 years old, MOE, &_years_dash "
 	  mPopUnder18Years_&_years. = "Persons under 18 years old, MOE, &_years_dash "
+	  mPop18_24Years_&_years. = "Persons 18-24 years old, MOE, &_years_dash "
 	  mPop18_34Years_&_years. = "Persons 18-34 years old, MOE, &_years_dash "
 	  mPop35_64Years_&_years. = "Persons 35-64 years old, MOE,&_years_dash "
 	  mPop65andOverYears_&_years. = "Persons 65 years old and over, MOE, &_years_dash "
@@ -154,6 +164,9 @@
 		sum( B01001Ie3, B01001Ie4, B01001Ie5, B01001Ie6, 
 			 B01001Ie18, B01001Ie19, B01001Ie20, B01001Ie21 );
 
+	Pop18_24YearsH_&_years.	= 
+		sum(B01001Ie7, B01001Ie8, B01001Ie22, B01001Ie23);
+
 	Pop18_34YearsH_&_years.	= 
 		sum(B01001Ie7, B01001Ie8, B01001Ie9, B01001Ie10, 
 			B01001Ie22, B01001Ie23, B01001Ie24, B01001Ie25);
@@ -176,6 +189,9 @@
 		%moe_sum( var= B01001Im3 B01001Im4 B01001Im5 B01001Im6 
 			B01001Im18 B01001Im19 B01001Im20 B01001Im21 );
 
+	mPop18_24YearsH_&_years.	= 
+		sum(B01001Im7, B01001Im8, B01001Im22, B01001Im23);
+
 	mPop18_34YearsH_&_years. = 
 		%moe_sum( var=B01001Im7 B01001Im8 B01001Im9 B01001Im10 
 			B01001Im22 B01001Im23 B01001Im24 B01001Im25 );
@@ -192,6 +208,7 @@
 		NumHshldsH_&_years. = "Total HHs, Hispanic/Latino, &_years_dash "
 		Pop5andOverYearsH_&_years. = "Persons 5 years old and over Hispanic/Latino, &_years_dash "
 		PopUnder18YearsH_&_years. = "Persons under 18 years old, Hispanic/Latino, &_years_dash "
+		Pop18_24YearsH_&_years. = "Persons 18-24 years old, Hispanic/Latino, &_years_dash "
 		Pop18_34YearsH_&_years. = "Persons 18-34 years old, Hispanic/Latino, &_years_dash "
 		Pop35_64YearsH_&_years. = "Persons 35-64 years old, Hispanic/Latino, &_years_dash "
 		Pop65andOverYearsH_&_years. = "Persons 65 years old and over, Hispanic/Latino, &_years_dash "
@@ -200,6 +217,7 @@
 		mNumHshldsA_&_years. = "Total HHs, Asian, Hawaiian, and other Pacific Islander, MOE, &_years_dash "
 		mPop5andOverYearsH_&_years. = "Persons 5 years old and over Hispanic/Latino, MOE, &_years_dash "
 		mPopUnder18YearsH_&_years. = "Persons under 18 years old, Hispanic/Latino, MOE, &_years_dash "
+		Pop18_24YearsH_&_years. = "Persons 18-24 years old, Hispanic/Latino, &_years_dash "
 		mPop18_34YearsH_&_years. = "Persons 18-34 years old, Hispanic/Latino, MOE, &_years_dash "
 		mPop35_64YearsH_&_years. = "Persons 35-64 years old, Hispanic/Latino, MOE, &_years_dash "
 		mPop65andOverYearsH_&_years. = "Persons 65 years old and over, Hispanic/Latino, MOE, &_years_dash "
