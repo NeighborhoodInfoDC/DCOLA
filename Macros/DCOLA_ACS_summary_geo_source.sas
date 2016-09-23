@@ -144,6 +144,12 @@
 
 	NumHshldsH_&_years. = B19001Ie1;
 
+	Pop5andOverYearsH_&_years. = 
+		sum(B01001Ie4, B01001Ie5, B01001Ie6, B01001Ie7, B01001Ie8, B01001Ie9, B01001Ie10, 
+			B01001Ie11, B01001Ie12, B01001Ie13, B01001Ie14, B01001Ie15, B01001Ie16,
+			B01001Ie18, B01001Ie19, B01001Ie20, B01001Ie21, B01001Ie22, B01001Ie23, B01001Ie24,
+			B01001Ie25, B01001Ie26, B01001Ie27, B01001Ie28, B01001Ie29, B01001Ie30, B01001Ie31);
+
 	PopUnder18YearsH_&_years. =
 		sum( B01001Ie3, B01001Ie4, B01001Ie5, B01001Ie6, 
 			 B01001Ie18, B01001Ie19, B01001Ie20, B01001Ie21 );
@@ -158,9 +164,13 @@
 
 	mNumFamiliesH_&_years. = B19101Im1;
 
-	mNumHshldsW_&_years. = B19001Hm1;
-
 	mNumHshldsH_&_years. = B19001Im1;
+
+	mPop5andOverYearsH_&_years. = 
+		sum(B01001Im4 B01001Im5 B01001Im6 B01001Im7 B01001Im8 B01001Im9 B01001Im10 
+			B01001Im11 B01001Im12 B01001Im13 B01001Im14 B01001Im15 B01001Im16,
+			B01001Im18 B01001Im19 B01001Im20 B01001Im21 B01001Im22 B01001Im23 B01001Im24,
+			B01001Im25 B01001Im26 B01001Im27 B01001Im28 B01001Im29 B01001Im30 B01001Im31);
 
 	mPopUnder18YearsH_&_years. = 
 		%moe_sum( var= B01001Im3 B01001Im4 B01001Im5 B01001Im6 
@@ -180,6 +190,7 @@
     label
 		NumFamiliesH_&_years. = "Family HHs, Hispanic/Latino, &_years_dash "
 		NumHshldsH_&_years. = "Total HHs, Hispanic/Latino, &_years_dash "
+		Pop5andOverYearsH_&_years. = "Persons 5 years old and over Hispanic/Latino, &_years_dash "
 		PopUnder18YearsH_&_years. = "Persons under 18 years old, Hispanic/Latino, &_years_dash "
 		Pop18_34YearsH_&_years. = "Persons 18-34 years old, Hispanic/Latino, &_years_dash "
 		Pop35_64YearsH_&_years. = "Persons 35-64 years old, Hispanic/Latino, &_years_dash "
@@ -187,6 +198,7 @@
 		mNumFamiliesH_&_years. = "Family HHs, Hispanic/Latino, MOE, &_years_dash "
 		mNumHshldsH_&_years. = "Total HHs, Hispanic/Latino, MOE, &_years_dash "
 		mNumHshldsA_&_years. = "Total HHs, Asian, Hawaiian, and other Pacific Islander, MOE, &_years_dash "
+		mPop5andOverYearsH_&_years. = "Persons 5 years old and over Hispanic/Latino, MOE, &_years_dash "
 		mPopUnder18YearsH_&_years. = "Persons under 18 years old, Hispanic/Latino, MOE, &_years_dash "
 		mPop18_34YearsH_&_years. = "Persons 18-34 years old, Hispanic/Latino, MOE, &_years_dash "
 		mPop35_64YearsH_&_years. = "Persons 35-64 years old, Hispanic/Latino, MOE, &_years_dash "
@@ -281,37 +293,86 @@
     
       ** Latino population by country of origin **;
 
-		PopMexican_&_years. = B03001e4;
-		PopPuertoRican_&_years. = B03001e5;
-		PopCuban_&_years. = B03001e6;
-		PopDominican_&_years. = B03001e7;
-		PopCentAmerican_&_years. = B03001e8;
-		PopSouthAmerican_&_years. = B03001e16;
-		PopOtherHisp_&_years. = B03001e27;
+		PopHispMexican_&_years. = B03001e4;
+		PopHispPuertoRican_&_years. = B03001e5;
+		PopHispCuban_&_years. = B03001e6;
+		PopHispDominican_&_years. = B03001e7;
+		PopHispOtherCentAmer_&_years. = B03001e15;
+		PopHispOtherSouthAmer_&_years. = B03001e26;
+		PopHispOtherHispOrig_&_years. = B03001e27;
+		PopHispArgentinean_&_years. = B03001e17
+		PopHispBolivian_&_years. = B03001e18
+		PopHispChilean_&_years. = B03001e19
+		PopHispColombian_&_years. = B03001e20
+		PopHispCostaRican_&_years. = B03001e9
+		PopHispEcuadorian_&_years. = B03001e21
+		PopHispElSalvadoran_&_years. = B03001e14
+		PopHispGuatemalan_&_years. = B03001e10
+		PopHispHonduran_&_years. = B03001e11
+		PopHispNicaraguan_&_years. = B03001e12
+		PopHispPananamian_&_years. = B03001e13
+		PopHispPeruvian_&_years. = B03001e23
 
-		mPopMexican_&_years. = B03001m4;
-		mPopPuertoRican_&_years. = B03001m5;
-		mPopCuban_&_years. = B03001m6;
-		mPopDominican_&_years. = B03001m7;
-		mPopCentAmerican_&_years. = B03001m8;
-		mPopSouthAmerican_&_years. = B03001m16;
-		mPopOtherHisp_&_years. = B03001m27;
+		mPopHispMexican_&_years. = B03001m4;
+		mPopHispPuertoRican_&_years. = B03001m5;
+		mPopHispCuban_&_years. = B03001m6;
+		mPopHispDominican_&_years. = B03001m7;
+		mPopHispOtherCentAmer_&_years. = B03001m15;
+		mPopHispOtherSouthAmer_&_years. = B03001m26;
+		mPopHispOtherHispOrig_&_years. = B03001m27;
+		mPopHispArgentinean_&_years. = B03001m17
+		mPopHispBolivian_&_years. = B03001m18
+		mPopHispChilean_&_years. = B03001m19
+		mPopHispColombian_&_years. = B03001m20
+		mPopHispCostaRican_&_years. = B03001m9
+		mPopHispEcuadorian_&_years. = B03001m21
+		mPopHispElSalvadoran_&_years. = B03001m14
+		mPopHispGuatemalan_&_years. = B03001m10
+		mPopHispHonduran_&_years. = B03001m11
+		mPopHispNicaraguan_&_years. = B03001m12
+		mPopHispPananamian_&_years. = B03001m13
+		mPopHispPeruvian_&_years. = B03001m23
+
 
 	label
-		PopMexican_&_years. = "Hispanic/Latino population that is Mexican, &_years_dash "
-		PopPuertoRican_&_years. = "Hispanic/Latino population that is Puerto Rican, &_years_dash "
-		PopCuban_&_years. = "Hispanic/Latino population that is Cuban, &_years_dash "
-		PopDominican_&_years. = "Hispanic/Latino population that is Dominican, &_years_dash "
-		PopCentAmerican_&_years. = "Hispanic/Latino population that is Central American, &_years_dash "
-		PopSouthAmerican_&_years. = "Hispanic/Latino population that is South American, &_years_dash "
-		PopOtherHisp_&_years. = "Other Hispanic/Latino population, &_years_dash "
-		mPopMexican_&_years. = "Hispanic/Latino population that is Mexican, MOE, &_years_dash "
-		mPopPuertoRican_&_years. = "Hispanic/Latino population that is Puerto Rican, MOE, &_years_dash "
-		mPopCuban_&_years. = "Hispanic/Latino population that is Cuban, MOE, &_years_dash "
-		mPopDominican_&_years. = "Hispanic/Latino population that is Dominican, MOE, &_years_dash "
-		mPopCentAmerican_&_years. = "Hispanic/Latino population that is Central American, MOE, &_years_dash "
-		mPopSouthAmerican_&_years. = "Hispanic/Latino population that is South American, MOE, &_years_dash "
-		mPopOtherHisp_&_years. = "Other Hispanic/Latino population, MOE, &_years_dash "
+		PopHispMexican_&_years. = "Persons of Mexican origin, &_years_dash "
+		PopHispPuertoRican_&_years. = "Persons of Puerto Rican origin, &_years_dash "
+		PopHispCuban_&_years. = "Persons of Cuban origin, &_years_dash "
+		PopHispDominican_&_years. = "Persons of Dominican origin, &_years_dash "
+		PopHispOtherCentAmeri_&_years. = "Persons of Other Central American origin, &_years_dash "
+		PopHispSouthAmer_&_years. = "Persons of Other South American origin, &_years_dash "
+		PopHispOtherHispOrig_&_years. = "Persons of Other Hispanic origin, &_years_dash "
+		PopHispArgentinean_&_years. = "Persons of Argentinian origin, &_years_dash "
+		PopHispBolivian_&_years. = "Persons of Bolivian origin, &_years_dash "
+		PopHispChilean_&_years. = "Persons of Chilean origin, &_years_dash "
+		PopHispColombian_&_years. = "Persons of Colombian origin, &_years_dash "
+		PopHispCostaRican_&_years. = "Persons of Costa Rican origin, &_years_dash "
+		PopHispEcuadorian_&_years. = "Persons of Ecuadorian origin, &_years_dash "
+		PopHispElSalvadoran_&_years. = "Persons of El Salvadoran origin, &_years_dash "
+		PopHispGuatemalan_&_years. = "Persons of Guatemalan origin, &_years_dash "
+		PopHispHonduran_&_years. = "Persons of Honduran origin, &_years_dash "
+		PopHispNicaraguan_&_years. = "Persons of Nicaraguan origin, &_years_dash "
+		PopHispPananamian_&_years. = "Persons of Panamanian origin, &_years_dash "
+		PopHispPeruvian_&_years. = "Persons of Peruvian origin, &_years_dash "
+		mPopHispMexican_&_years. = "Persons of Mexican origin, MOE, &_years_dash "
+		mPopHispPuertoRican_&_years. = "Persons of Puerto Rican origin, MOE, &_years_dash "
+		mPopHispCuban_&_years. = "Persons of Cuban origin, MOE, &_years_dash "
+		mPopHispDominican_&_years. = "Persons of Dominican origin, MOE, &_years_dash "
+		mPopHispOtherCentAmeri_&_years. = "Persons of Other Central American origin, MOE, &_years_dash "
+		mPopHispSouthAmer_&_years. = "Persons of Other South American origin, MOE, &_years_dash "
+		mPopHispOtherHispOrig_&_years. = "Persons of Other Hispanic origin, MOE, &_years_dash "
+		mPopHispArgentinean_&_years. = "Persons of Argentinian origin, MOE, &_years_dash "
+		mPopHispBolivian_&_years. = "Persons of Bolivian origin, MOE, &_years_dash "
+		mPopHispChilean_&_years. = "Persons of Chilean origin, MOE, &_years_dash "
+		mPopHispColombian_&_years. = "Persons of Colombian origin, MOE, &_years_dash "
+		mPopHispCostaRican_&_years. = "Persons of Costa Rican origin, MOE, &_years_dash "
+		mPopHispEcuadorian_&_years. = "Persons of Ecuadorian origin, MOE, &_years_dash "
+		mPopHispElSalvadoran_&_years. = "Persons of El Salvadoran origin, MOE, &_years_dash "
+		mPopHispGuatemalan_&_years. = "Persons of Guatemalan origin, MOE, &_years_dash "
+		mPopHispHonduran_&_years. = "Persons of Honduran origin, MOE, &_years_dash "
+		mPopHispNicaraguan_&_years. = "Persons of Nicaraguan origin, MOE, &_years_dash "
+		mPopHispPananamian_&_years. = "Persons of Panamanian origin, MOE, &_years_dash "
+		mPopHispPeruvian_&_years. = "Persons of Peruvian origin, MOE, &_years_dash "
 
     %end;
 
@@ -564,7 +625,7 @@
       
     %end;
     
-	  /* **Employment - Block group-level variables**;
+	 **Employment - Block group-level variables**;
 
  	  PopEmployedByOcc_&_years. = C24010e1;
 			PopEmployedMngmt_&_years. = sum(C24010e3, C24010e39 );
@@ -619,7 +680,7 @@
 			mPopEmployedSalesH_&_years. = "Persons 16+ years old employed in sales and office occupations, Hispanic/Latino, MOE, &_years_dash "
 			mPopEmployedNatResH_&_years. = "Persons 16+ years old employed in natural resources, construction, and maintenance occupations, Hispanic/Latino, MOE, &_years_dash "
 			mPopEmployedProdH_&_years. = "Persons 16+ years old employed in production, transportation, and material moving occupations, Hispanic/Latino, MOE, &_years_dash "
-		;*/
+		;
 
     ** Education **;
 

@@ -157,10 +157,16 @@
 		   mPopAloneM_&_years. mPopAloneIOM_&_years.
 		   mPopAloneAIOM_&_years.
 
-		   mPopMexican_&_years. mPopPuertoRican_&_years. 
-		   mPopCuban_&_years. mPopDominican_&_years. 
-		   mPopCentAmerican_&_years. mPopSouthAmerican_&_years.
-		   mPopOtherHisp_&_years.
+		   mPopHispMexican_&_years. mPopHispPuertoRican_&_years.
+		   mPopHispCuban_&_years. mPopHispDominican_&_years.
+		   mPopHispOtherCentAmer_&_years. mPopHispOtherSouthAmer_&_years. 
+		   mPopHispOtherHispOrig_&_years. mPopHispArgentinean_&_years. 
+		   mPopHispBolivian_&_years. mPopHispChilean_&_years. 
+		   mPopHispColombian_&_years. mPopHispCostaRican_&_years.
+		   mPopHispEcuadorian_&_years. mPopHispElSalvadoran_&_years. 
+		   mPopHispGuatemalan_&_years. mPopHispHonduran_&_years. 
+		   mPopHispNicaraguan_&_years. mPopHispPananamian_&_years. 
+		   mPopHispPeruvian_&_years. 
 
 		   mPopCivilianEmployed_&_years. mPopCivilianEmployedB_&_years.
 		   mPopCivilianEmployedW_&_years. mPopCivilianEmployedH_&_years.

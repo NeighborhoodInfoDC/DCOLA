@@ -10,7 +10,7 @@
  Description:  Create all standard summary files from ACS 5-year data.
  
  Modifications:
-	8/22/2016: Adapted to DCOLA
+	8/22/2016: SD Adapted to DCOLA
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
