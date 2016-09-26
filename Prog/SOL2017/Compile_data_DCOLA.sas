@@ -13,8 +13,11 @@
 %include "L:\SAS\Inc\StdLocal.sas";
 
 ** Define libraries **;
+%DCData_lib( DCOLA )
 %DCData_lib( ACS )
 %DCData_lib( Equity )
+%DCData_lib( NCDB )
+
 
 %let inc_dollar_yr=2015;
 %let racelist=W B H AIOM;

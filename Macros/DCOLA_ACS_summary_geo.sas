@@ -46,6 +46,67 @@
 		   ;
            
     %let moe_vars =
+        mPopAloneB_&_years.
+        mPopAloneW_&_years.
+        mPopAloneH_&_years.
+        mPopAloneA_&_years.
+        mPopAloneI_&_years.
+        mPopAloneO_&_years.
+        mPopAloneM_&_years.
+        mPopAloneIOM_&_years.
+        mPopAloneAIOM_&_years.
+        mPopWithRace_&_years.
+        mPopBlackNonHispBridge_&_years.
+        mPopWhiteNonHispBridge_&_years.
+        mPopHisp_&_years.
+        mPopAsianPINonHispBridge_&_years.
+        mPopOtherNonHispBridge_&_years.
+        mPopOtherRaceNonHispBr_&_years.
+        mPopMultiracialNonHisp_&_years.
+        mPopEmployedByOcc_&_years.
+        mPopEmployedMngmt_&_years.
+        mPopEmployedServ_&_years.
+        mPopEmployedSales_&_years.
+        mPopEmployedNatRes_&_years.
+        mPopEmployedProd_&_years.
+        mPopEmployedByOccH_&_years.
+        mPopEmployedMngmtH_&_years.
+        mPopEmployedServH_&_years.
+        mPopEmployedSalesH_&_years.
+        mPopEmployedNatResH_&_years.
+        mPopEmployedProdH_&_years.
+        mNumOccupiedHsgUnits_&_years.
+        mNumOccupiedHsgUnitsB_&_years.
+        mNumOccupiedHsgUnitsW_&_years.
+        mNumOccupiedHsgUnitsH_&_years.
+        mNumOccupiedHsgUnitsA_&_years.
+        mNumOccupiedHsgUnitsIOM_&_years.
+        mNumOccupiedHsgUnitsAIOM_&_years.
+        mNumOwnerOccupiedHU_&_years.
+        mNumOwnerOccupiedHUB_&_years.
+        mNumOwnerOccupiedHUW_&_years.
+        mNumOwnerOccupiedHUH_&_years.
+        mNumOwnerOccupiedHUA_&_years.
+        mNumOwnerOccupiedHUIOM_&_years.
+        mNumOwnerOccupiedHUAIOM_&_years.
+        mMedFamIncm_&_years.
+        mMedFamIncmB_&_years.
+        mMedFamIncmW_&_years.
+        mMedFamIncmH_&_years.
+        mMedFamIncmA_&_years.
+        mMedFamIncmIOM_&_years.
+        mMedFamIncmAIOM_&_years.
+        mNumFamilies_&_years.
+        mPopUnder18Years_&_years.
+        mPop18_34Years_&_years.
+        mPop35_64Years_&_years.
+        mPop65andOverYears_&_years.
+        mPop25andOverYears_&_years.
+        mPop25andOverWoutHS_&_years.
+        mPop25andOverWHS_&_years.
+        mPop25andOverWSC_&_years.
+        mPop25andOverWCollege_&_years.
+    /*
 		   mPopUnder18Years_&_years. mPop18_34Years_&_years.
 		   mPop35_64Years_&_years. mPop65andOverYears_&_years.
 
@@ -108,6 +169,7 @@
 		   mNumOwnerOccupiedHUW_&_years. mNumOwnerOccupiedHUH_&_years.
 		   mNumOwnerOccupiedHUA_&_years. mNumOwnerOccupiedHUIOM_&_years.
 		   mNumOwnerOccupiedHUAIOM_&_years.
+           */
            ;
                
   %end;
@@ -120,9 +182,70 @@
 		   PopOnly: PopSpan: PopEng: PopNo: PopOther:
 		   PopAlone: PopWithRace: PopBlack: PopWhite: PopHisp: PopAsian: PopNative: PopNonEnglish: PopOther: PopMulti: 
            PopInCivLaborForce: PopCivilian: PopUnemployed: 
-           Elderly: Num: Med:;
+           /*Elderly:*/ Num: Med:;
            
     %let moe_vars =
+        mPopAloneB_&_years.
+        mPopAloneW_&_years.
+        mPopAloneH_&_years.
+        mPopAloneA_&_years.
+        mPopAloneI_&_years.
+        mPopAloneO_&_years.
+        mPopAloneM_&_years.
+        mPopAloneIOM_&_years.
+        mPopAloneAIOM_&_years.
+        mPopWithRace_&_years.
+        mPopBlackNonHispBridge_&_years.
+        mPopWhiteNonHispBridge_&_years.
+        mPopHisp_&_years.
+        mPopAsianPINonHispBridge_&_years.
+        mPopOtherNonHispBridge_&_years.
+        mPopOtherRaceNonHispBr_&_years.
+        mPopMultiracialNonHisp_&_years.
+        mPopEmployedByOcc_&_years.
+        mPopEmployedMngmt_&_years.
+        mPopEmployedServ_&_years.
+        mPopEmployedSales_&_years.
+        mPopEmployedNatRes_&_years.
+        mPopEmployedProd_&_years.
+        mPopEmployedByOccH_&_years.
+        mPopEmployedMngmtH_&_years.
+        mPopEmployedServH_&_years.
+        mPopEmployedSalesH_&_years.
+        mPopEmployedNatResH_&_years.
+        mPopEmployedProdH_&_years.
+        mNumOccupiedHsgUnits_&_years.
+        mNumOccupiedHsgUnitsB_&_years.
+        mNumOccupiedHsgUnitsW_&_years.
+        mNumOccupiedHsgUnitsH_&_years.
+        mNumOccupiedHsgUnitsA_&_years.
+        mNumOccupiedHsgUnitsIOM_&_years.
+        mNumOccupiedHsgUnitsAIOM_&_years.
+        mNumOwnerOccupiedHU_&_years.
+        mNumOwnerOccupiedHUB_&_years.
+        mNumOwnerOccupiedHUW_&_years.
+        mNumOwnerOccupiedHUH_&_years.
+        mNumOwnerOccupiedHUA_&_years.
+        mNumOwnerOccupiedHUIOM_&_years.
+        mNumOwnerOccupiedHUAIOM_&_years.
+        mMedFamIncm_&_years.
+        mMedFamIncmB_&_years.
+        mMedFamIncmW_&_years.
+        mMedFamIncmH_&_years.
+        mMedFamIncmA_&_years.
+        mMedFamIncmIOM_&_years.
+        mMedFamIncmAIOM_&_years.
+        mNumFamilies_&_years.
+        mPopUnder18Years_&_years.
+        mPop18_34Years_&_years.
+        mPop35_64Years_&_years.
+        mPop65andOverYears_&_years.
+        mPop25andOverYears_&_years.
+        mPop25andOverWoutHS_&_years.
+        mPop25andOverWHS_&_years.
+        mPop25andOverWSC_&_years.
+        mPop25andOverWCollege_&_years.
+		   /*
 		   mNumHshlds_&_years. mNumHshldsH_&_years.
 
 		   mNumFamilies_&_years. mNumFamiliesH_&_years.
@@ -184,6 +307,7 @@
 		   mPopInCivLaborForceW_&_years. mPopInCivLaborForceH_&_years.
 		   mPopInCivLaborForceA_&_years. mPopInCivLaborForceIOM_&_years.
 		   mPopInCivLaborForceAIOM_&_years.
+		   */
 
 		   /*mPopEmployedByOcc_&_years. mPopEmployedMngmt_&_years.
 		   mPopEmployedServ_&_years. mPopEmployedSales_&_years.
@@ -213,6 +337,7 @@
 		   mPopEmployedServAIOM_&_years. mPopEmployedSalesAIOM_&_years.
 		   mPopEmployedNatResAIOM_&_years. mPopEmployedProdAIOM_&_years.*/
 
+           /*
            mPop25andOverWoutHS_&_years. mPop25andOverWoutHSB_&_years.
 		   mPop25andOverWoutHSW_&_years. mPop25andOverWoutHSH_&_years.
 		   mPop25andOverWoutHSA_&_years. mPop25andOverWoutHSIOM_&_years.
@@ -253,6 +378,7 @@
 		   mNumOwnerOccupiedHUW_&_years. mNumOwnerOccupiedHUH_&_years.
 		   mNumOwnerOccupiedHUA_&_years. mNumOwnerOccupiedHUIOM_&_years.
 		   mNumOwnerOccupiedHUAIOM_&_years.
+	*/
            ;
                
   %end;

@@ -19,8 +19,10 @@
 %DCData_lib( ACS )
 %DCData_lib( DCOLA )
 
+**options mprint symbolgen mlogic;
 
-%Equity_ACS_summary_all( 
+
+%DCOLA_ACS_summary_all( 
 
   /** State abbreviation. Ex: DC **/
   state_ab = DC,
