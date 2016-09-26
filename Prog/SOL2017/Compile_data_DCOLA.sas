@@ -43,13 +43,14 @@ data dcola.sol2017;
 	           PopWhiteNonHispBridge: PopHisp: PopAsianPINonHispBridge:
 	           PopOtherRaceNonHispBridge: NumOwnerOccHsgUnits:)
 
-      	Ncdb.Ncdb_lf_2000_dc
-	        (keep=&geo
-	           trctpop0 forbczn0 forbnoc0
-				educ110 aedlths0 bedlths0 hedlths0 iedlths0 medlths0 oedlths0 xedlths0
-				)
+      	dcola.Ncdb_2000_dc_sum&geosuf
+	        (keep=&geo Pop25andOver: PopUnemployed: PopInCiv: PopUnder18: Pop18_24: Pop25_64:
+			Pop65: AggHshld: NumHshlds:)
 
-		acs.
+      	dcola.Ncdb_1990_dc_sum&geosuf
+			(keep=&geo Pop25andOver: PopUnemployed: PopInCiv: PopUnder18: Pop18_24: Pop25_64:
+			Pop65: AggHshld: NumHshlds:)
+
 
 		equity.acs_2010_14_dc_sum_bg&geosuf
 			(keep=TotPop: mTotPop: 
