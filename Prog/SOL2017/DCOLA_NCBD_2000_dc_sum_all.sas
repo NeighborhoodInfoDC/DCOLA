@@ -25,5 +25,7 @@
   /** State abbreviation. Ex: DC **/
   state_ab = DC,
 
+    /** Year range (xxxx_yy). Ex: 2005_09 **/
+  years = 2000
 )
 

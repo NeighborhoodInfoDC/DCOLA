@@ -249,7 +249,6 @@
 	  PopEngLessThanVeryWellH_&_years. = sum(B16006e5, B16006e6, B16006e7)
 	  PopOtherLangH_&_years. = B16006e8;
 
-
 	  mPopForeignBornH_&_years. = B06004Im5;
 	  mPopForeignBorn_&_years. = B05002m13;
 

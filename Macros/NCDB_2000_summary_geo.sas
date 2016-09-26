@@ -23,66 +23,25 @@
   %let geo_suffix = %sysfunc( putc( &geo_name, $geosuf. ) );
   %let geo_label = %sysfunc( putc( &geo_name, $geodlbl. ) );
   
-  %let out_ds = NCDB_2000_&state_ab._sum&source_geo_suffix.&geo_suffix;
+  %let out_ds = NCDB_&_years._&state_ab._sum&source_geo_suffix.&geo_suffix;
 
   
     %** Count variables for tract data **;
   
     %let count_vars = 
-            Pop25andOverWoutHS_2000 Pop25andOverWoutHSB_2000
-			Pop25andOverWoutHSW_2000 Pop25andOverWoutHSH_2000
-			Pop25andOverWoutHSAIOM_2000
-
-			Pop25andOverWHS_2000 Pop25andOverWHSB_2000
-			Pop25andOverWHSW_2000 Pop25andOverWHSH_2000
-			Pop25andOverWHSAIOM_2000
-
-			Pop25andOverWSC_2000 Pop25andOverWSCB_2000
-			Pop25andOverWSCW_2000 Pop25andOverWSCH_2000
-			Pop25andOverWSCAIOM_2000
-
-			PopUnemployed_2000 PopUnemployedW_2000
-			PopUnemployedB_2000 PopUnemployedH_2000
-			PopUnemployedAIOM_2000
-
-			PopInCivLaborForce_2000 PopInCivLaborForceW_2000
-			PopInCivLaborForceB_2000 PopInCivLaborForceH_2000
-			PopInCivLaborForceAIOM_2000
-
-			PopUnder18Years_2000 PopUnder18YearsB_2000
-			PopUnder18YearsW_2000 PopUnder18YearsH_2000
-			PopUnder18YearsAIOM_2000
-
-			Pop18_24Years_2000 Pop18_24YearsB_2000
-			Pop18_24YearsW_2000 Pop18_24YearsH_2000
-			Pop18_24YearsAIOM_2000
-
-			Pop25_64Years_2000 Pop25_64YearsB_2000
-			Pop25_64YearsW_2000 Pop25_64YearsH_2000
-			Pop25_64YearsAIOM_2000
-
-			Pop65andOverYears_2000 Pop65andOverYearsB_2000
-			Pop65andOverYearsW_2000 Pop65andOverYearsH_2000
-			Pop65andOverYearsAIOM_2000
-
-			AggHshldIncome_2000 AggHshldIncomeB_2000
-			AggHshldIncomeW_2000 AggHshldIncomeH_2000
-			AggHshldIncomeAIOM_2000
-
-			NumHshlds_2000 NumHshldsB_2000
-			NumHshldsW_2000 NumHshldsH_2000
-			NumHshldsAIOM_2000
+            Pop25andOver: Pop25andOverWoutHS: Pop25andOverWHS: Pop25andOverWSC: 
+			PopUnemployed: PopInCivLaborForce: 
+			PopUnder18Years: Pop18_24Years: Pop25_64Years:
+			Pop65andOverYears: AggHshldIncome: NumHshlds: NumOwner:
 			;
-                          
-  %end;
-  
+                            
   %put _local_;
   
   %if ( &geo_name = GEO2000 and %upcase( &source_geo_var ) = GEO2000 ) %then %do;
 
     ** Census tracts from census tract source (same year): just recopy selected vars **;
     
-    data &_out_lib..&out_ds (label="NCDB summary, 2000, %upcase(&_state_ab), &source_geo_label source, &geo_label");
+    data &_out_lib..&out_ds (label="NCDB summary, &_years_dash, %upcase(&_state_ab), &source_geo_label source, &geo_label");
     
       set &source_ds_work (keep=&geo_var &count_vars);
 
@@ -105,7 +64,7 @@
       wgt_id_vars=,
       wgt_wgt_var=popwt,
       out_ds_name=&_out_lib..&out_ds,
-      out_ds_label=%str(NCDB summary, 2000, %upcase(&_state_ab), &source_geo_label source, &geo_label),
+      out_ds_label=%str(NCDB summary, &_years_dash, %upcase(&_state_ab), &source_geo_label source, &geo_label),
       calc_vars=,
       calc_vars_labels=,
       keep_nonmatch=N,
@@ -134,7 +93,7 @@
     %Dc_update_meta_file(
       ds_lib=&_out_lib,
       ds_name=&out_ds,
-      creator_process=NCDB_2000_&state_ab._sum_all.sas,
+      creator_process=NCDB_&_years._&state_ab._sum_all.sas,
       restrictions=None,
       revisions=%str(&_revisions)
     )

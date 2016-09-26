@@ -15,7 +15,6 @@
 ** Define libraries **;
 %DCData_lib( ACS )
 %DCData_lib( DCOLA )
-%DCData_lib( Equity )
 
 
 data dcola.clusters;
@@ -33,14 +32,20 @@ data dcola.city_ward;
 
 run; 
 
-proc transpose data=dcola.city_ward out=dcola.sol_prez_cluster; 
+proc transpose data=dcola.clusters out=dcola.sol_clusters; 
 var PctHisp_:;
 id cltr00; 
 run; 
 
-proc transpose data=dcola.city_ward out=dcola.sol_crime_hispnghbd; 
+proc transpose data=dcola.clusters out=dcola.sol_crime_hispnghbd_2000; 
 var Rate_crimes_pt1_violent: Rate_crimes_pt1_property: ;
-where PctHisp >= 20;
+where PctHisp_2000 >= 20;
+id cltr00; 
+run; 
+
+proc transpose data=dcola.clusters out=dcola.sol_crime_hispnghbd_2010_14; 
+var Rate_crimes_pt1_violent: Rate_crimes_pt1_property: ;
+where PctHisp_2010_14 >= 20;
 id cltr00; 
 run; 
 
@@ -62,8 +67,8 @@ var PopBlackNonHispBridge: PopWhiteNonHispBridge:
 	PctForeignBorn: PctNativeBorn: PctCitizen:
 	PctNaturalized: PctNonCitizen: PctNonEnglish:
 
-	PctPopUnder18Years: PctPop18_34Years:
-	PctPop35_64Years: PctPop65andOverYears:
+	PctPopUnder18Years: PctPop18_24Years:
+	PctPop25_64Years: PctPop65andOverYears:
  
 	Pct_births_w_race: Pct_births_black:
 	Pct_births_asian: Pct_births_hisp:
@@ -85,15 +90,12 @@ var PopBlackNonHispBridge: PopWhiteNonHispBridge:
 	PctEmployedSalesH: PctEmployedNatResH: 
 	PctEmployedProdH: 
 
-	MedFamIncmB: MedFamIncmW: MedFamIncmH:
-	MedFamIncmA: MedFamIncmIOM:
+	AvgHshldIncAdjB: AvgHshldIncAdjW: 
+	AvgHshldIncAdjH: AvgHshldIncAdjAIOM: 
 
-	PctOwnerOccupiedHUW: PctOwnerOccHsgUnitsNHWhite:
-	PctOwnerOccupiedHUB: PctOwnerOccHsgUnitsBlack:
+	PctOwnerOccupiedHUW: PctOwnerOccupiedHUB: 
 	PctOwnerOccupiedHUH: PctOwnerOccHsgUnitsHisp:
 	PctOwnerOccupiedHUAIOM:
-	PctOwnerOccHsgUnitsAsianPI:
-	PctOwnerOccHsgUnitsOther:
 
 	Pct_births_prenat_adeq: Pct_births_prenat_adeq_blk:
 	Pct_births_prenat_adeq_asn Pct_births_prenat_adeq_hsp:
@@ -112,14 +114,17 @@ proc export data=dcola.sol_pres
 	dbms=csv replace;
 	run;
 
-proc export data=dcola.sol_prez_cluster
+proc export data=dcola.sol__clusters
 	outfile="D:\DCDATA\Libraries\DCOLA\Prog\LatinoPop_cluster.csv"
 	dbms=csv replace;
 	run;
 
-proc export data=dcola.sol_crime_hispnghbd
+proc export data=dcola.sol_crime_hispnghbd_2000
 	outfile="D:\DCDATA\Libraries\DCOLA\Prog\crime_LatinoNghbds.csv"
 	dbms=csv replace;
 	run;
 
-
+proc export data=dcola.sol_crime_hispnghbd_2010_14
+	outfile="D:\DCDATA\Libraries\DCOLA\Prog\crime_LatinoNghbds.csv"
+	dbms=csv replace;
+	run;

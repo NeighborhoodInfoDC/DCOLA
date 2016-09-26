@@ -16,17 +16,23 @@
   /** State abbreviation. Ex: DC **/
   state_ab = DC,
   
+    /** Year range (xxxx_yy). Ex: 2005_09 **/
+  years = 1990,
+  
   finalize = Y,
   revisions = New file.
 
   );
 
 
-  %global _state_ab _out_lib _finalize _revisions;
+  %global _state_ab _years _years_dash _last_year _out_lib _finalize _revisions;
 
   %** Program parameters **;
 
   %let _state_ab   = %lowcase(&state_ab);
+  %let _years = &years;
+  %let _years_dash = %sysfunc( translate( &_years, '-', '_' ) );
+  %let _last_year = 19%scan( &_years, 2, _ );
   %let _finalize = &finalize;
   %let _revisions = &revisions;
 

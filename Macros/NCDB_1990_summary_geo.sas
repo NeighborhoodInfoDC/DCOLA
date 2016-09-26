@@ -23,66 +23,29 @@
   %let geo_suffix = %sysfunc( putc( &geo_name, $geosuf. ) );
   %let geo_label = %sysfunc( putc( &geo_name, $geodlbl. ) );
   
-  %let out_ds = NCDB_1990_&state_ab._sum&source_geo_suffix.&geo_suffix;
+  %let out_ds = NCDB_&_years._&state_ab._sum&source_geo_suffix.&geo_suffix;
 
   
     %** Count variables for tract data **;
   
     %let count_vars = 
-            Pop25andOverWoutHS_1990 Pop25andOverWoutHSB_1990
-			Pop25andOverWoutHSW_1990 Pop25andOverWoutHSH_1990
-			Pop25andOverWoutHSAIOM_1990
 
-			Pop25andOverWHS_1990 Pop25andOverWHSB_1990
-			Pop25andOverWHSW_1990 Pop25andOverWHSH_1990
-			Pop25andOverWHSAIOM_1990
-
-			Pop25andOverWSC_1990 Pop25andOverWSCB_1990
-			Pop25andOverWSCW_1990 Pop25andOverWSCH_1990
-			Pop25andOverWSCAIOM_1990
-
-			PopUnemployed_1990 PopUnemployedW_1990
-			PopUnemployedB_1990 PopUnemployedH_1990
-			PopUnemployedAIOM_1990
-
-			PopInCivLaborForce_1990 PopInCivLaborForceW_1990
-			PopInCivLaborForceB_1990 PopInCivLaborForceH_1990
-			PopInCivLaborForceAIOM_1990
-
-			PopUnder18Years_1990 PopUnder18YearsB_1990
-			PopUnder18YearsW_1990 PopUnder18YearsH_1990
-			PopUnder18YearsAIOM_1990
-
-			Pop18_24Years_1990 Pop18_24YearsB_1990
-			Pop18_24YearsW_1990 Pop18_24YearsH_1990
-			Pop18_24YearsAIOM_1990
-
-			Pop25_64Years_1990 Pop25_64YearsB_1990
-			Pop25_64YearsW_1990 Pop25_64YearsH_1990
-			Pop25_64YearsAIOM_1990
-
-			Pop65andOverYears_1990 Pop65andOverYearsB_1990
-			Pop65andOverYearsW_1990 Pop65andOverYearsH_1990
-			Pop65andOverYearsAIOM_1990
-
-			AggHshldIncome_1990 AggHshldIncomeB_1990
-			AggHshldIncomeW_1990 AggHshldIncomeH_1990
-			AggHshldIncomeAIOM_1990
-
-			NumHshlds_1990 NumHshldsB_1990
-			NumHshldsW_1990 NumHshldsH_1990
-			NumHshldsAIOM_1990
+			PopWithRace: PopBlackNonHispBridge:
+	        PopWhiteNonHispBridge: PopHisp: PopAsianPINonHispBridge:
+	        PopOtherRaceNonHispBridge:
+            Pop25andOver: Pop25andOverWoutHS: Pop25andOverWHS: Pop25andOverWSC: 
+			PopUnemployed: PopInCivLaborForce: 
+			PopUnder18Years: Pop18_24Years: Pop25_64Years:
+			Pop65andOverYears: AggHshldIncome: NumHshlds:
 			;
-                          
-  %end;
-  
+                            
   %put _local_;
   
   %if ( &geo_name = GEO1990 and %upcase( &source_geo_var ) = GEO1990 ) %then %do;
 
     ** Census tracts from census tract source (same year): just recopy selected vars **;
     
-    data &_out_lib..&out_ds (label="NCDB summary, 1990, %upcase(&_state_ab), &source_geo_label source, &geo_label");
+    data &_out_lib..&out_ds (label="NCDB summary, &_years_dash, %upcase(&_state_ab), &source_geo_label source, &geo_label");
     
       set &source_ds_work (keep=&geo_var &count_vars);
 
@@ -105,7 +68,7 @@
       wgt_id_vars=,
       wgt_wgt_var=popwt,
       out_ds_name=&_out_lib..&out_ds,
-      out_ds_label=%str(NCDB summary, 1990, %upcase(&_state_ab), &source_geo_label source, &geo_label),
+      out_ds_label=%str(NCDB summary, &_years_dash, %upcase(&_state_ab), &source_geo_label source, &geo_label),
       calc_vars=,
       calc_vars_labels=,
       keep_nonmatch=N,
@@ -134,7 +97,7 @@
     %Dc_update_meta_file(
       ds_lib=&_out_lib,
       ds_name=&out_ds,
-      creator_process=NCDB_1990_&state_ab._sum_all.sas,
+      creator_process=NCDB_&_years._&state_ab._sum_all.sas,
       restrictions=None,
       revisions=%str(&_revisions)
     )
