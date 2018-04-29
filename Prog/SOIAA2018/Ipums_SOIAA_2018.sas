@@ -100,7 +100,7 @@ run;
 proc format;
   value bpld_a
     00100-12092 = 'US & territories'
-    15000-19900, 29900 = 'Other North America'
+    15000-19900, 29900, 29999 = 'Other North America'
     20000       = 'Mexico'
     21000-21090 = 'Central America'
     25000-26095 = 'Caribbean'
@@ -192,6 +192,21 @@ data Ipums_SOIAA_2018;
     aframerican = 1;
   else aframerican = 0;
 
+  **** Characteristics ****;
+
+  if hispand = 000 then do;
+    select;          /** Non-hispanic **/
+      when (raced = 200) raceth = 1;        /** Black **/
+      when (raced = 100) raceth = 2;        /** White **/
+      when (raced in (400:699)) raceth = 4;      /** Asian/PI **/
+      when (raced in (801:990)) raceth = 6;  /** Multiple races **/
+      otherwise raceth = 5;       /** Other (Am. Ind, AK Nat., Other race) **/
+    end;
+  end;
+  else if 100 <= hispand <= 499 then do;
+    raceth = 3;                 /** Hispanic **/
+  end;
+
   format raced RACED_F.;
 
 run;
@@ -201,5 +216,7 @@ run;
 
 proc freq data=Ipums_SOIAA_2018;
   tables immigrant_1gen * aframerican * raced / missing list;
+  tables raceth * hispand * raced / missing list;
+  tables raceth;
 run;
 
