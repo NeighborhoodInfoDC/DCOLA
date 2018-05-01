@@ -21,18 +21,25 @@
 %DCData_lib( DCOLA )
 %DCData_lib( IPUMS )
 
-%let ipums_keep_vars = 
-  year serial pernum hhwt perwt bpld momloc poploc
-  citizen raced hispand speakeng;
+%let ipums_keep_a = 
+  year serial pernum hhwt perwt gq bpld momloc poploc
+  citizen raced hispand speakeng lingisol;
+  
+%let ipums_keep_b =
+  numprec hhincome diff: empstatd gradeatt ind occ labforce 
+  poverty rentgrs school sex speakeng trantime tranwork
+  uhrswork valueh yrimmig;
 
 data A;
 
   set
     Ipums.Ipums_2000_dc
-      (/*OBS=300*/ keep=&ipums_keep_vars languagd
-       rename=(languagd=languaged))
-    Ipums.Acs_2011_15_dc /** TEMPORARY UNTIL 2012_16 READY **/
-      (/*OBS=300*/ keep=&ipums_keep_vars languaged);
+      (OBS=300 keep=&ipums_keep_a &ipums_keep_b languagd educ99 ownershd 
+       rename=(languagd=languaged ownershd=ownershpd yrimmig=yrimmig00))
+    Ipums.Acs_2011_15_dc                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
+      (OBS=300 keep=&ipums_keep_a languaged)
+    Ipums.Acs_2012_16_dc
+      (OBS=300 keep=&ipums_keep_a &ipums_keep_b hud_inc hcov: educd foodstmp owncost ownershpd yrnatur);
 
 run;
 
@@ -208,6 +215,12 @@ data Ipums_SOIAA_2018;
   end;
 
   format raced RACED_F.;
+  
+  ** HUD income levels (2000) **;
+  
+  if year = 0 then do;
+    %hud_inc_1999()
+  end;
 
 run;
 
@@ -219,4 +232,14 @@ proc freq data=Ipums_SOIAA_2018;
   tables raceth * hispand * raced / missing list;
   tables raceth;
 run;
+
+%Finalize_data_set( 
+  data=Ipums_SOIAA_2018,
+  out=Ipums_SOIAA_2018,
+  outlib=DCOLA,
+  label="IPUMS, DC State of Immigrants/African Americans report, 2018",
+  sortby=year serial pernum,
+  freqvars=year hud_inc,
+  revisions=%str(New file.)
+)
 
