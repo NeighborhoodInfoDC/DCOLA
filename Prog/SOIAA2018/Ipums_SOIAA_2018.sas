@@ -34,36 +34,15 @@ data A;
 
   set
     Ipums.Ipums_2000_dc
-      (OBS=300 keep=&ipums_keep_a &ipums_keep_b languagd educ99 ownershd 
+      (keep=&ipums_keep_a &ipums_keep_b languagd educ99 ownershd 
        rename=(languagd=languaged ownershd=ownershpd yrimmig=yrimmig00))
     Ipums.Acs_2011_15_dc                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (OBS=300 keep=&ipums_keep_a languaged)
+      (keep=&ipums_keep_a languaged)
     Ipums.Acs_2012_16_dc
-      (OBS=300 keep=&ipums_keep_a &ipums_keep_b hud_inc hcov: educd foodstmp owncost ownershpd yrnatur);
+      (keep=&ipums_keep_a &ipums_keep_b hud_inc hcov: educd foodstmp owncost ownershpd yrnatur);
 
 run;
 
-/*** 
-proc sql noprint;
-  create table A_w_parents as
-  select 
-    A.*, 
-    A_mom.bpld as bpld_mom, A_mom.citizen as citizen_mom, A_mom.raced as raced_mom,
-    A_mom.hispand as hispand_mom, A_mom.speakeng as speakeng_mom, 
-    A_mom.languaged as languaged_mom
-  from A 
-  left join A as A_mom
-  on A.year = A_mom.year and A.serial = A_mom.serial and A.momloc = A_mom.pernum
-  order by A.year, A.serial, A.pernum;
-quit;
-
-proc print data=A_w_parents;
-  where year = 0 and serial in ( 5359750, 5359755, 5359839 );
-  id serial pernum;
-  by serial;
-  var momloc poploc bpld bpld_mom;
-run;
-***/
 
 ** Add data for mother and father (only if in same household) **;
 
@@ -89,20 +68,6 @@ proc sql noprint;
   order by A_w_mom.year, A_w_mom.serial, A_w_mom.pernum;
 quit;
 
-** Check matching results **;
-
-proc print data=A_w_parents;
-  where 
-    ( year = 0 and serial in ( 5359750, 5359755, 5359839 ) ) or 
-    ( year = 2015 and serial in ( 1279726, 1279722, 1279744 ) );
-  by year serial;
-  id pernum;
-  var momloc poploc bpld bpld_mom bpld_pop;
-run;
-
-proc freq data=A_w_parents;
-  tables bpld_mom bpld_pop;
-run;
 
 proc format;
   value bpld_a
@@ -221,25 +186,64 @@ data Ipums_SOIAA_2018;
   if year = 0 then do;
     %hud_inc_1999()
   end;
+  
+  label
+    Total = "Total"
+    immigrant_1gen = "1st generation immigrant"
+    latino_1gen = "Latino (1st generation immigrant)"
+    asianpi_1gen "Asian/Pacific Islander (1st generation immigrant)"
+    african_1gen = "African (1st generation immigrant)"
+    otherimm_1gen = "Other 1st generation immigrant"
+    immigrant_mom = "Mother is 1st gen immigrant"
+    latino_mom = "Mother is Latino 1st gen immigrant"
+    asianpi_mom = "Mother is Asian/PI 1st gen immigrant"
+    african_mom = "Mother is African 1st gen immigrant"
+    otherimm_mom = "Mother is other 1st gen immigrant"
+    immigrant_pop = "Father is 1st gen immigrant"
+    latino_pop = "Father is Latino 1st gen immigrant"
+    asianpi_pop = "Father is Asian/PI 1st gen immigrant"
+    african_pop = "Father is African 1st gen immigrant"
+    otherimm_pop = "Father is other 1st gen immigrant"
+    immigrant_2gen = "2nd generation immigrant"
+    latino_2gen = "Latino (2nd generation immigrant)"
+    asianpi_2gen = "Asian/Pacific Islander (2nd generation immigrant)"
+    african_2gen = "African (2nd generation immigrant)"
+    otherimm_2gen = "Other 2nd generation immigrant"
+    aframerican = "African American"
+    raceth = "Race/ethnicity";
 
 run;
 
-proc means data=Ipums_SOIAA_2018 n sum mean min max;
+%Finalize_data_set( 
+  REGISTER_METADATA=N,
+  data=Ipums_SOIAA_2018,
+  out=Ipums_SOIAA_2018,
+  outlib=DCOLA,
+  label="DC State of Immigrants/African Americans report 2018, IPUMS",
+  sortby=year serial pernum,
+  freqvars=year hud_inc raceth,
+  revisions=%str(New file.)
+)
+
+** Check mother/father matching results **;
+
+proc print data=A_w_parents;
+  where 
+    ( year = 0 and serial in ( 5359750, 5359755, 5359839 ) ) or 
+    ( year = 2015 and serial in ( 1279726, 1279722, 1279744 ) );
+  by year serial;
+  id pernum;
+  var momloc poploc bpld bpld_mom bpld_pop;
 run;
+
+proc freq data=A_w_parents;
+  tables bpld_mom bpld_pop;
+run;
+
+** Check immigrant and race/ethnicity codings **;
 
 proc freq data=Ipums_SOIAA_2018;
   tables immigrant_1gen * aframerican * raced / missing list;
   tables raceth * hispand * raced / missing list;
-  tables raceth;
 run;
-
-%Finalize_data_set( 
-  data=Ipums_SOIAA_2018,
-  out=Ipums_SOIAA_2018,
-  outlib=DCOLA,
-  label="IPUMS, DC State of Immigrants/African Americans report, 2018",
-  sortby=year serial pernum,
-  freqvars=year hud_inc,
-  revisions=%str(New file.)
-)
 
