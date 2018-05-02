@@ -86,7 +86,7 @@ proc format;
     95000-99900, . = 'Missing';
 run;    
 
-%macro immigrant_vars( src, suffix );
+%macro immigrant_vars( bpld=, citizen=, suffix= );
 
   immigrant_&suffix = 0;
 
@@ -95,9 +95,9 @@ run;
   african_&suffix = 0;
   otherimm_&suffix = 0;
   
-  if citizen in ( 2, 3 ) then do;
+  if &citizen in ( 2, 3 ) then do;
   
-    select ( put( &src, bpld_a. ) );
+    select ( put( &bpld, bpld_a. ) );
 
       when ( 'US & territories' ) do;
         /** Nothing **/
@@ -147,18 +147,26 @@ data Ipums_SOIAA_2018;
   
   ** Create immigrant flags **;
 
-  %immigrant_vars( bpld, 1gen )
+  %immigrant_vars( bpld=bpld, citizen=citizen, suffix=1gen )
 
-  %immigrant_vars( bpld_mom, mom )
+  %immigrant_vars( bpld=bpld_mom, citizen=citizen_mom, suffix=mom )
 
-  %immigrant_vars( bpld_pop, pop )
+  %immigrant_vars( bpld=bpld_pop, citizen=citizen_pop, suffix=pop )
 
-  immigrant_2gen = max( immigrant_mom, immigrant_pop );
+  immigrant_2gen = not( immigrant_1gen ) and max( immigrant_mom, immigrant_pop );
 
-  latino_2gen = max( latino_mom, latino_pop );
-  asianpi_2gen = max( asianpi_mom, asianpi_pop );
-  african_2gen = max( african_mom, african_pop );
-  otherimm_2gen = max( otherimm_mom, otherimm_pop );
+  if immigrant_2gen then do;
+    latino_2gen = max( latino_mom, latino_pop );
+    asianpi_2gen = max( asianpi_mom, asianpi_pop );
+    african_2gen = max( african_mom, african_pop );
+    otherimm_2gen = max( otherimm_mom, otherimm_pop );
+  end;
+  else if not immigrant_2gen then do;
+    latino_2gen = 0;
+    asianpi_2gen = 0;
+    african_2gen = 0;
+    otherimm_2gen = 0;
+  end;
 
   ** Create African American flag **;
 
@@ -231,13 +239,13 @@ run;
 
 ** Check mother/father matching results **;
 
-proc print data=A_w_parents;
+proc print data=Ipums_SOIAA_2018;
   where 
-    ( year = 0 and serial in ( 5359750, 5359755, 5359839 ) ) or 
-    ( year = 2015 and serial in ( 1279726, 1279722, 1279744 ) );
+    ( year = 0 and serial in ( 5359750, 5359779, 5359823, 5360068 ) ) or 
+    ( year = 2015 and serial in ( 1279726, 1279817, 1279869, 1279976 ) );
   by year serial;
   id pernum;
-  var momloc poploc bpld bpld_mom bpld_pop;
+  var momloc poploc bpld: citizen: immigrant: latino_2gen asianpi_2gen african_2gen otherimm_2gen;
 run;
 
 proc freq data=A_w_parents;
@@ -248,6 +256,7 @@ run;
 
 proc freq data=Ipums_SOIAA_2018;
   tables citizen * bpld / missing list;
+  tables immigrant_1gen * immigrant_2gen / missing list;
   tables immigrant_1gen * citizen / missing list;
   tables immigrant_1gen * aframerican * raced / missing list;
   tables raceth * hispand * raced / missing list;
