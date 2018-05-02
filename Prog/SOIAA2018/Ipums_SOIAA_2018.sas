@@ -27,8 +27,8 @@
   
 %let ipums_keep_b =
   numprec hhincome diff: empstatd gradeatt ind occ labforce 
-  poverty rentgrs school sex speakeng trantime tranwork
-  uhrswork valueh yrimmig;
+  poverty rentgrs school age sex speakeng trantime tranwork
+  uhrswork valueh yrimmig ftotinc incwelfr incwage incbus00;
 
 data A;
 
