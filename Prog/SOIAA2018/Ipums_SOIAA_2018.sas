@@ -71,19 +71,19 @@ quit;
 
 proc format;
   value bpld_a
-    00100-12092 = 'US & territories'
-    15000-19900, 29900, 29999 = 'Other North America'
+    00100-12092, 71040-71050, 90000-90022 = 'US & territories'
+    15000-19900, 29900, 29999 = 'Canada & other North America'
     20000       = 'Mexico'
     21000-21090 = 'Central America'
     25000-26095 = 'Caribbean'
     30000-30091 = 'South America'
     40000-49900 = 'Europe'
     50000-59900 = 'Asia'
-    71000-71090 = 'Pacific Islands'
+    71000-71039 = 'Pacific Islands'
     60000-60099 = 'Africa'
     70000-70020 = 'Australia & New Zealand'
-    71090, 80000-95000 = 'Other non-US'
-    . = 'Missing';
+    71090, 80000-80050 = 'Other non-US'
+    95000-99900, . = 'Missing';
 run;    
 
 %macro immigrant_vars( src, suffix );
@@ -95,42 +95,46 @@ run;
   african_&suffix = 0;
   otherimm_&suffix = 0;
   
-  select ( put( &src, bpld_a. ) );
+  if citizen in ( 2, 3 ) then do;
+  
+    select ( put( &src, bpld_a. ) );
 
-    when ( 'US & territories' ) do;
-      /** Nothing **/
+      when ( 'US & territories' ) do;
+        /** Nothing **/
+      end;
+
+      when ( 'Mexico', 'Central America', 'Caribbean', 'South America' ) do;
+        latino_&suffix = 1;
+      end;
+
+      when ( 'Asia', 'Pacific Islands' ) do;
+        asianpi_&suffix = 1;
+      end;
+
+      when ( 'Africa' ) do;
+        african_&suffix = 1;
+      end;
+
+      when ( 'Canada & other North America', 'Europe', 'Australia & New Zealand', 'Other non-US' ) do;
+        otherimm_&suffix = 1;
+      end;
+
+      when ( 'Missing' ) do;
+        latino_&suffix = .;
+        asianpi_&suffix = .;
+        african_&suffix = .;
+        otherimm_&suffix = .;
+      end;
+
+      otherwise do;
+        %warn_put( msg="Unknown place of birth " _n_= bpld= )
+      end;
+
     end;
 
-    when ( 'Mexico', 'Central America', 'Caribbean', 'South America' ) do;
-      latino_&suffix = 1;
-    end;
-
-    when ( 'Asia', 'Pacific Islands' ) do;
-      asianpi_&suffix = 1;
-    end;
-
-    when ( 'Africa' ) do;
-      african_&suffix = 1;
-    end;
-
-    when ( 'Other North America', 'Europe', 'Australia & New Zealand', 'Other non-US' ) do;
-      otherimm_&suffix = 1;
-    end;
-
-    when ( 'Missing' ) do;
-      latino_&suffix = .;
-      asianpi_&suffix = .;
-      african_&suffix = .;
-      otherimm_&suffix = .;
-    end;
-
-    otherwise do;
-      %warn_put( msg="Unknown place of birth " _n_= bpld= )
-    end;
-
+    immigrant_&suffix = max( latino_&suffix, asianpi_&suffix, african_&suffix, otherimm_&suffix );
+    
   end;
-
-  immigrant_&suffix = max( latino_&suffix, asianpi_&suffix, african_&suffix, otherimm_&suffix );
 
 %mend immigrant_vars;
 
@@ -243,7 +247,10 @@ run;
 ** Check immigrant and race/ethnicity codings **;
 
 proc freq data=Ipums_SOIAA_2018;
+  tables citizen * bpld / missing list;
+  tables immigrant_1gen * citizen / missing list;
   tables immigrant_1gen * aframerican * raced / missing list;
   tables raceth * hispand * raced / missing list;
+  format bpld bpld_a.;
 run;
 
