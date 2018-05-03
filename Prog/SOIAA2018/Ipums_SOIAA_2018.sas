@@ -297,7 +297,7 @@ data Ipums_SOIAA_2018;
   if 16 <= age < 25 then do;
  
     if gradeatt > 0 then do;
-      youth_disconnect = 0;
+      youth_disconnect = 1;
     end;
     else do;
     
