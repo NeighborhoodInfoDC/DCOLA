@@ -199,6 +199,10 @@ data Ipums_SOIAA_2018;
     %hud_inc_1999()
   end;
   
+  ** Rent burden **;
+  
+  if ownershpd = 22 and hhincome > 0 then Rent_burden = 100 * rentgrs / hhincome;
+  
   label
     Total = "Total"
     immigrant_1gen = "1st generation immigrant"
@@ -222,7 +226,8 @@ data Ipums_SOIAA_2018;
     african_2gen = "African (2nd generation immigrant)"
     otherimm_2gen = "Other 2nd generation immigrant"
     aframerican = "African American"
-    raceth = "Race/ethnicity";
+    raceth = "Race/ethnicity"
+    Rent_burden = "Rent burden (% income spent on rent)";
 
 run;
 
