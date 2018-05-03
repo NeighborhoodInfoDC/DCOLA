@@ -201,7 +201,7 @@ data Ipums_SOIAA_2018;
   
   ** Rent burden **;
   
-  if ownershpd = 22 and hhincome > 0 then Rent_burden = 100 * rentgrs / hhincome;
+  if ownershpd = 22 and hhincome > 0 then Rent_burden = 100 * rentgrs / ( hhincome / 12 );
   
   label
     Total = "Total"
@@ -238,6 +238,7 @@ run;
   outlib=DCOLA,
   label="DC State of Immigrants/African Americans report 2018, IPUMS",
   sortby=year serial pernum,
+  printobs=5,
   freqvars=year hud_inc raceth,
   revisions=%str(New file.)
 )
