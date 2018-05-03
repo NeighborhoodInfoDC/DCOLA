@@ -23,12 +23,12 @@
 
 %let ipums_keep_a = 
   year serial pernum hhwt perwt gq bpld momloc poploc
-  citizen raced hispand speakeng lingisol;
+  citizen raced hispand age speakeng lingisol;
   
 %let ipums_keep_b =
   numprec hhincome diff: empstatd gradeatt ind occ labforce 
-  poverty rentgrs school age sex speakeng trantime tranwork
-  uhrswork valueh yrimmig 
+  poverty rentgrs school sex speakeng trantime tranwork
+  uhrswork valueh yrimmig yrsusa1 yrsusa2
   ftotinc inctot incwelfr incwage incbus00 incinvst incretir;
 
 data A;
@@ -234,6 +234,20 @@ data Ipums_SOIAA_2018;
   end;
 
   format raced RACED_F.;
+  
+  ** Year of immigration **;
+  
+  if year = 0 then do;
+  
+    select ( yrimmig00 );
+      when ( 0 ) yrimmig = .n;
+      when ( 1 ) yrimmig = 2000;
+      otherwise yrimmig = 1000 + yrimmig00;
+    end;
+    
+  end;
+  
+  if yrimmig = 0 then yrimmig = .n;
   
   ** HUD income levels (2000) **;
   
