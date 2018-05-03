@@ -28,7 +28,8 @@
 %let ipums_keep_b =
   numprec hhincome diff: empstatd gradeatt ind occ labforce 
   poverty rentgrs school age sex speakeng trantime tranwork
-  uhrswork valueh yrimmig ftotinc incwelfr incwage incbus00;
+  uhrswork valueh yrimmig 
+  ftotinc inctot incwelfr incwage incbus00 incinvst incretir;
 
 data A;
 
@@ -178,6 +179,47 @@ data Ipums_SOIAA_2018;
 
   **** Characteristics ****;
 
+  ** Add N/A missing values for 2000 income vars **;
+  
+  if year = 0 then do;
+  
+    array inc6{*} hhincome ftotinc inctot incwage incbus00 incinvst incretir;
+    
+    do i = 1 to dim( inc6 );
+    
+      if inc6{i} = 999999 then inc6{i} = .n;
+      
+    end;
+  
+    if incwelfr = 99999 then incwelfr = .n;
+    
+  end;
+  
+  ** Convert income vars to constant $ 2016 dollars **;
+  
+  if year = 0 then do;
+    %dollar_convert( hhincome, hhincome_2016, 1999, 2016 )
+    %dollar_convert( ftotinc, ftotinc_2016, 1999, 2016 )
+    %dollar_convert( inctot, inctot_2016, 1999, 2016 )
+    %dollar_convert( incwage, incwage_2016, 1999, 2016 )
+    %dollar_convert( incbus00, incbus00_2016, 1999, 2016 )
+    %dollar_convert( incinvst, incinvst_2016, 1999, 2016 )
+    %dollar_convert( incretir, incretir_2016, 1999, 2016 )
+    %dollar_convert( incwelfr, incwelfr_2016, 1999, 2016 )
+  end;
+  else if year = 2016 then do;
+    hhincome_2016 = hhincome;
+    ftotinc_2016 = ftotinc;
+    inctot_2016 = inctot;
+    incwage_2016 = incwage;
+    incbus00_2016 = incbus00;
+    incinvst_2016 = incinvst;
+    incretir_2016 = incretir;
+    incwelfr_2016 = incwelfr;
+  end;
+
+  ** Race/ethnicity **;
+  
   if hispand = 000 then do;
     select;          /** Non-hispanic **/
       when (raced = 200) raceth = 1;        /** Black **/
@@ -203,11 +245,12 @@ data Ipums_SOIAA_2018;
   
   if ownershpd = 22 and hhincome > 0 then Rent_burden = 100 * rentgrs / ( hhincome / 12 );
   
+  
   label
     Total = "Total"
     immigrant_1gen = "1st generation immigrant"
     latino_1gen = "Latino (1st generation immigrant)"
-    asianpi_1gen "Asian/Pacific Islander (1st generation immigrant)"
+    asianpi_1gen = "Asian/Pacific Islander (1st generation immigrant)"
     african_1gen = "African (1st generation immigrant)"
     otherimm_1gen = "Other 1st generation immigrant"
     immigrant_mom = "Mother is 1st gen immigrant"
@@ -227,7 +270,18 @@ data Ipums_SOIAA_2018;
     otherimm_2gen = "Other 2nd generation immigrant"
     aframerican = "African American"
     raceth = "Race/ethnicity"
-    Rent_burden = "Rent burden (% income spent on rent)";
+    Rent_burden = "Rent burden (% income spent on rent)"
+    hhincome_2016 = "Household income ($ 2016)"
+    incwage_2016 = "Earnings ($ 2016)"
+    ftotinc_2016 = "Total family income ($ 2016)"
+    inctot_2016 = "Total personal income ($ 2016"
+    incwage_2016 = "Wage and salary income ($ 2016)"
+    incbus00_2016 = "Business and farm income ($ 2016)"
+    incinvst_2016 = "Interest, dividend, and rental income ($ 2016)"
+    incretir_2016 = "Retirement income ($ 2016)"
+    incwelfr_2016 = "Welfare (public assistance) income ($ 2016)";
+
+  drop i;
 
 run;
 
