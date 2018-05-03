@@ -259,7 +259,39 @@ data Ipums_SOIAA_2018;
   
   if ownershpd = 22 and hhincome > 0 then Rent_burden = 100 * rentgrs / ( hhincome / 12 );
   
+  ** Education **;
   
+  if year ~= 0 and not( missing( educd ) ) then do;
+    
+    select;
+    
+      when ( educd = 1 ) educ99 = .n;
+      when ( educd = 2 ) educ99 = 1;
+      when ( educd = 11 ) educ99 = 2;
+      when ( educd = 12 ) educ99 = 3;
+      when ( educd in ( 14:17 ) ) educ99 = 4;
+      when ( educd in ( 22:26 ) ) educ99 = 5;
+      when ( educd = 30 ) educ99 = 6;
+      when ( educd = 40 ) educ99 = 7;
+      when ( educd = 50 ) educ99 = 8;
+      when ( educd = 61 ) educ99 = 9;
+      when ( educd in ( 63:64 ) ) educ99 = 10;
+      when ( educd in ( 65:71 ) ) educ99 = 11;
+      when ( educd = 81 ) educ99 = 12;
+      when ( educd = 101 ) educ99 = 14;
+      when ( educd = 114 ) educ99 = 15;
+      when ( educd = 115 ) educ99 = 16;
+      when ( educd = 116 ) educ99 = 17;
+      
+    end;
+    
+  end;
+  else do;
+  
+    if educ99 = 0 then educ99 = .n;
+    
+  end;
+
   label
     Total = "Total"
     immigrant_1gen = "1st generation immigrant"
