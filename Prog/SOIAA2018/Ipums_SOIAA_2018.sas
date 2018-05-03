@@ -291,6 +291,32 @@ data Ipums_SOIAA_2018;
     if educ99 = 0 then educ99 = .n;
     
   end;
+  
+  ** Youth disconnection indicator **;
+  
+  if 16 <= age < 25 then do;
+ 
+    if gradeatt > 0 then do;
+      youth_disconnect = 0;
+    end;
+    else do;
+    
+      if educ99 >= 10 then do;
+        if empstatd in ( 10, 12, 14, 15 ) then
+          youth_disconnect = 2; /** 16-25, HS diploma, not in school, working **/
+        else 
+          youth_disconnect = 3; /** 16-25, HS diploma, not in school, not working **/
+      end;
+      else do;
+        if empstatd in ( 10, 12, 14, 15 ) then
+          youth_disconnect = 4; /** 16-25, no HS diploma, not in school, working **/
+        else 
+          youth_disconnect = 5; /** 16-25, no HS diploma, not in school, not working **/
+      end;        
+      
+    end;
+     
+  end;
 
   label
     Total = "Total"
@@ -325,7 +351,8 @@ data Ipums_SOIAA_2018;
     incbus00_2016 = "Business and farm income ($ 2016)"
     incinvst_2016 = "Interest, dividend, and rental income ($ 2016)"
     incretir_2016 = "Retirement income ($ 2016)"
-    incwelfr_2016 = "Welfare (public assistance) income ($ 2016)";
+    incwelfr_2016 = "Welfare (public assistance) income ($ 2016)"
+    youth_disconnect = "Disconnected youth indicator";
 
   drop i;
 
@@ -367,5 +394,19 @@ proc freq data=Ipums_SOIAA_2018;
   tables immigrant_1gen * aframerican * raced / missing list;
   tables raceth * hispand * raced / missing list;
   format bpld bpld_a.;
+run;
+
+proc format;
+  value educ99_b
+    low-<10 = 'No HS dipl'
+    10-high = 'HS dipl';
+  value gradeatt_b
+    0 = 'Not in school'
+    1-high = 'In school';
+
+proc freq data=Ipums_SOIAA_2018;
+  where year in ( 0, 2016 ) and 16 <= age <= 24;
+  tables educ99 * gradeatt * empstatd * youth_disconnect / missing list nocum nopercent;
+  format educ99 educ99_b. gradeatt gradeatt_b.;
 run;
 
