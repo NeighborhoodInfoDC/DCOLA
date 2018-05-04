@@ -26,6 +26,16 @@ proc format;
     2015 = '2011-15'
     2016 = '2012-16';
     
+  value yrimmig_a
+    1900 -< 1950 = "1900 - 1949"
+    1950 -< 1960 = "1950 - 1959"
+    1960 -< 1970 = "1960 - 1969"
+    1970 -< 1980 = "1970 - 1979"
+    1980 -< 1990 = "1980 - 1989"
+    1990 -< 2000 = "1990 - 1999"
+    2000 -< 2010 = "2000 - 2009"
+    2010 - high = "2010 or later";
+
   value raceth
     1 = 'Black'
     2 = 'White'
@@ -57,7 +67,7 @@ proc format;
     45 -< 55 = '45 - 54'
     55 -< 65 = '55 - 64'
     65 -< 75 = '65 - 74'
-    75 - high = '75 or higher';
+    75 - high = '75 or older';
     
   value occ_a
     0, .n = "N/A"
@@ -111,18 +121,31 @@ proc format;
     200 - high = "200% federal poverty level or higher";
 
   value incwage_a
-    low-<25000 = "Under $25,000"
+    low-<0 = "Loss (<$0)"
+    0 = "None ($0)"
+    0<-<25000 = "Under $25,000"
     25000-<50000 = "$25,000 - 49,999"
     50000-<100000 = "$50,000 - 99,999"
     100000-high = "$100,000 or more";
     
+  value incbus_a
+    low-<0 = "Loss (<$0)"
+    0 = "None ($0)"
+    0<-<5000 = "Under $5,000"
+    5000-<10000 = "$5,000 - 9,999"
+    10000-<15000 = "$10,000 - 14,999"
+    15000-<25000 = "$15,000 - 24,999"
+    25000-<50000 = "$25,000 - 49,999"
+    50000-<75000 = "$50,000 - 74,999"
+    75000-high = "$75,000 or more";
+    
   value trantime_a
     0 = "Worked at home/did not work last week"
-    0 <-< 30 = "Under 30 minutes"
+    0 <-< 15 = "Under 15 minutes"
+    15 -< 30 = "15 - 29 minutes"
     30 -< 60 = "30 - 59 minutes"
     60 -< 90 = "60 - 89 minutes"
-    90 -< 120 = "90 - 119 minutes"
-    120 - high = "120 minutes or more";
+    90 - high = "90 minutes or more";
     
   value languaged_a (notsorted)
     1200 = "Spanish"
@@ -234,7 +257,7 @@ run;
       /** Rows **/
       (
         sum=&poplbl
-        colpctsum=' ' * &by=&bylbl * f=comma12.1
+        &by=&bylbl * colpctsum=' ' * f=comma12.1
       ),
       /** Columns **/
       total=' ' * year=' '
@@ -248,75 +271,120 @@ run;
 /** End Macro Definition **/
 
 
-** Demographics **;
+%fdate()
 
-%table( pop=immigrant_1gen, poplbl="Immigrants", by=bpld, byfmt=bpld_a., bylbl="% Country of origin" )
+**options orientation=landscape;
+options nodate nonumber;
+options missing='-';
 
-%table( pop=immigrant_1gen, poplbl="Immigrants", by=citizen, byfmt=citizenf., bylbl="% Citizenship status" )
+/** Macro All_tables - Start Definition **/
 
-%table( pop=immigrant_1gen, poplbl="Immigrants", by=age, byfmt=age_a., bylbl="% Age" )
+%macro All_tables( poppre=, lblpre= );
 
-%table( pop=immigrant_1gen, poplbl="Immigrants", by=sex, byfmt=sex_f., bylbl="% Sex" )
+  ods listing close;
 
-%table( pop=immigrant_1gen, poplbl="Immigrants", by=raceth, byfmt=raceth., bylbl="% Race/ethnicity (self-identified)" )
+  ods rtf file="&_dcdata_default_path\DCOLA\Prog\SOIAA2018\Tables_ipums_SOIAA_2018_&poppre..rtf" style=Styles.Rtf_arial_9pt
+      /*bodytitle*/;
+      
+  title1 "State of Immigrants Report, 2018";
+  title2 "&lblpre";
 
+  footnote1 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
+      
+  ** Demographics **;
 
-** Jobs and economic opportunity **;
+  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=bpld, byfmt=bpld_a., bylbl="\i % Country of origin" )
 
-%table( pop=immigrant_1gen, poplbl="Immigrants", by=poverty, byfmt=poverty_a., bylbl="% Poverty status" )
+  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=citizen, byfmt=citizenf., bylbl="\i % Citizenship status" )
 
-%table( pop=immigrant_1gen and age >= 16, poplbl="Immigrants, 16+ years old", by=empstatd, byfmt=empstatd., bylbl="% Labor force status" )
+  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=yrimmig, byfmt=yrimmig_a., bylbl="\i % Year immigrated to US" )
 
-%table( pop=immigrant_1gen and age >= 16 and empstatd ~= 30, poplbl="Immigrants, 16+ years old in labor force", by=empstatd, byfmt=empstatd., bylbl="% Employment status" )
+  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=yrsusa2, byfmt=yrsusa2_f., bylbl="\i % Years in US" )
 
-%table( pop=immigrant_1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="Immigrants, civilian workers 16+ years old", by=incwage_2016, byfmt=incwage_a., bylbl="% Annual earnings/wages ($ 2016)" )
+  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=age, byfmt=age_a., bylbl="\i % Age" )
 
-%table( pop=immigrant_1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="Immigrants, civilian workers 16+ years old", by=incbus00_2016, byfmt=incwage_a., bylbl="% Annual business income ($ 2016)" )
+  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=sex, byfmt=sex_f., bylbl="\i % Sex" )
 
-%table( year1=., order=freq, pop=immigrant_1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="Immigrants, civilian workers 16+ years old", by=occ, byfmt=occ_a., bylbl="% Occupation" )
-
-%table( pop=immigrant_1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="Immigrants, civilian workers 16+ years old", by=trantime, byfmt=trantime_a., bylbl="% Travel time to work" )
-
-%table( pop=immigrant_1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="Immigrants, civilian workers 16+ years old", by=tranwork, byfmt=tranwork_f., bylbl="% Travel time to work" )
-
-%table( pop=immigrant_1gen and age >= 65, poplbl="Immigrants, 65+ years old", by=incretir_2016, byfmt=incwage_a., bylbl="% Annual retirement income ($ 2016)" )
-
-
-** Housing **;
-
-%table( pop=immigrant_1gen and gq in ( 1, 2, 5 ), poplbl="Immigrants, not in group quarters", by=numprec, byfmt=numprec_a., bylbl="% Household size (persons)" )
-
-%table( pop=immigrant_1gen and gq in ( 1, 2, 5 ), poplbl="Immigrants, not in group quarters", by=ownershpd, byfmt=ownershpd_f., bylbl="% Ownership of dwelling" )
-
-%table( pop=immigrant_1gen and gq in ( 1, 2, 5 ), poplbl="Immigrants, not in group quarters", by=ownershpd, byfmt=ownershpd_a., bylbl="% Ownership of dwelling" )
-
-%table( pop=immigrant_1gen and gq in ( 1, 2, 5 ), poplbl="Immigrants, not in group quarters", by=hhincome, byfmt=incwage_a., bylbl="% Household income" )
-
-%table( pop=immigrant_1gen and gq in ( 1, 2, 5 ), poplbl="Immigrants, not in group quarters", by=hud_inc, byfmt=hudinc., bylbl="% HUD income level" )
-
-%table( pop=immigrant_1gen and not( missing( Rent_burden ) ), poplbl="Immigrants, renters with cash rent", by=Rent_burden, byfmt=Rent_burden., bylbl="% Income spent on rent" )
+  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=raceth, byfmt=raceth., bylbl="\i % Race/ethnicity (self-identified)" )
 
 
-** Language **;
+  ** Jobs and economic opportunity **;
 
-%table( year2=2015, pop=immigrant_1gen and age >= 5, poplbl="Immigrants, 5+ years old", by=languaged, byfmt=languaged_a., bylbl="% Language spoken" )
+  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=poverty, byfmt=poverty_a., bylbl="\i % Poverty status" )
 
-%table( year2=2015, pop=immigrant_1gen and age >= 5, poplbl="Immigrants, 5+ years old", by=speakeng, byfmt=speakeng_f., bylbl="% English proficiency" )
+  %table( pop=&poppre._1gen and age >= 16, poplbl="\b &lblpre, 16+ years old", by=empstatd, byfmt=empstatd., bylbl="\i % Labor force status" )
 
-%table( year2=2015, pop=immigrant_1gen and gq in ( 1, 2, 5 ), poplbl="Immigrants, not in group quarters", by=lingisol, byfmt=lingisol_f., bylbl="% Linguistically isolated" )
+  %table( pop=&poppre._1gen and age >= 16 and empstatd ~= 30, poplbl="\b &lblpre, 16+ years old in labor force", by=empstatd, byfmt=empstatd., bylbl="\i % Employment status" )
 
-%table( year2=2015, pop=immigrant_2gen and age >= 5, poplbl="2nd generation immigrants, 5+ years old", by=languaged, byfmt=languaged_a., bylbl="% Language spoken" )
+  %table( year1=., order=freq, pop=&poppre._1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="\b &lblpre, civilian workers 16+ years old", by=occ, byfmt=occ_a., bylbl="\i % Occupation" )
 
-%table( year2=2015, pop=immigrant_2gen and age >= 5, poplbl="2nd generation immigrants, 5+ years old", by=speakeng, byfmt=speakeng_f., bylbl="% English proficiency" )
+  %table( pop=&poppre._1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="\b &lblpre, civilian workers 16+ years old", by=trantime, byfmt=trantime_a., bylbl="\i % Travel time to work" )
 
-%table( year2=2015, pop=immigrant_2gen and gq in ( 1, 2, 5 ), poplbl="2nd generation immigrants, not in group quarters", by=lingisol, byfmt=lingisol_f., bylbl="% Linguistically isolated" )
+  %table( pop=&poppre._1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="\b &lblpre, civilian workers 16+ years old", by=tranwork, byfmt=tranwork_f., bylbl="\i % Means of travel to work" )
+
+  %table( pop=&poppre._1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="\b &lblpre, civilian workers 16+ years old", by=incwage_2016, byfmt=incwage_a., bylbl="\i % Annual earnings/wages ($ 2016)" )
+
+  %table( pop=&poppre._1gen and age >= 16 and incbus00_2016 ~= 0, poplbl="\b &lblpre, with business income", by=incbus00_2016, byfmt=incbus_a., bylbl="\i % Annual business income ($ 2016)" )
+
+  %table( pop=&poppre._1gen and age >= 16 and incinvst_2016 ~= 0, poplbl="\b &lblpre, with investment income", by=incinvst_2016, byfmt=incbus_a., bylbl="\i % Annual investment income ($ 2016)" )
+
+  %table( pop=&poppre._1gen and age >= 65, poplbl="\b &lblpre, 65+ years old", by=incretir_2016, byfmt=incwage_a., bylbl="\i % Annual retirement income ($ 2016)" )
 
 
-** Education **;
+  ** Housing **;
 
-%table( pop=immigrant_1gen and age >= 18, poplbl="Immigrants, 18+ years", by=educ99, byfmt=educ99_a., bylbl="% Highest level of education" )
+  %table( pop=&poppre._1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not in group quarters", by=numprec, byfmt=numprec_a., bylbl="\i % Household size (persons)" )
 
-%table( pop=immigrant_1gen and 3 <= age <= 18, poplbl="Immigrants, 3-18 years", by=gradeatt, byfmt=gradeatt_a., bylbl="% School attendance" )
+  %table( pop=&poppre._1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not in group quarters", by=ownershpd, byfmt=ownershpd_f., bylbl="\i % Ownership of dwelling" )
 
-%table( pop=immigrant_1gen and 16 <= age <= 24, poplbl="Immigrants, 16-24 years", by=youth_disconnect, byfmt=youth_disconnect_a., bylbl="% Youth disconnection" )
+  %table( pop=&poppre._1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not in group quarters", by=ownershpd, byfmt=ownershpd_a., bylbl="\i % Ownership of dwelling" )
 
+  %table( pop=&poppre._1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not in group quarters", by=hhincome, byfmt=incwage_a., bylbl="\i % Household income" )
+
+  %table( pop=&poppre._1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not in group quarters", by=hud_inc, byfmt=hudinc., bylbl="\i % HUD income level" )
+
+  %table( pop=&poppre._1gen and not( missing( Rent_burden ) ), poplbl="\b &lblpre, renters with cash rent", by=Rent_burden, byfmt=Rent_burden., bylbl="\i % Income spent on rent" )
+
+
+  ** Language **;
+
+  %table( year2=2015, pop=&poppre._1gen and age >= 5, poplbl="\b &lblpre, 5+ years old", by=languaged, byfmt=languaged_a., bylbl="\i % Language spoken" )
+
+  %table( year2=2015, pop=&poppre._1gen and age >= 5, poplbl="\b &lblpre, 5+ years old", by=speakeng, byfmt=speakeng_f., bylbl="\i % English proficiency" )
+
+  %table( year2=2015, pop=&poppre._1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not in group quarters", by=lingisol, byfmt=lingisol_f., bylbl="\i % In linguistically isolated household" )
+
+  %table( year2=2015, pop=&poppre._2gen and age >= 5, poplbl="\b &lblpre (2nd gen), 5+ years old", by=languaged, byfmt=languaged_a., bylbl="\i % Language spoken" )
+
+  %table( year2=2015, pop=&poppre._2gen and age >= 5, poplbl="\b &lblpre (2nd gen), 5+ years old", by=speakeng, byfmt=speakeng_f., bylbl="\i % English proficiency" )
+
+  %table( year2=2015, pop=&poppre._2gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre (2nd gen), not in group quarters", by=lingisol, byfmt=lingisol_f., bylbl="\i % Linguistically isolated" )
+
+
+  ** Education **;
+
+  %table( pop=&poppre._1gen and age >= 18, poplbl="\b &lblpre, 18+ years", by=educ99, byfmt=educ99_a., bylbl="\i % Highest level of education" )
+
+  %table( pop=&poppre._1gen and 3 <= age <= 18, poplbl="\b &lblpre, 3-18 years", by=gradeatt, byfmt=gradeatt_a., bylbl="\i % School attendance" )
+
+  %table( pop=&poppre._1gen and 16 <= age <= 24, poplbl="\b &lblpre, 16-24 years", by=youth_disconnect, byfmt=youth_disconnect_a., bylbl="\i % Youth disconnection" )
+
+
+  ods rtf close;
+  ods listing;
+
+  title1;
+  footnote1;
+
+%mend All_tables;
+
+/** End Macro Definition **/
+
+
+%All_tables( poppre=immigrant, lblpre=Immigrants )
+
+%All_tables( poppre=latino, lblpre=Latinos )
+
+%All_tables( poppre=asianpi, lblpre=Asians/Pacific Islanders )
+
+%All_tables( poppre=african, lblpre=Africans )
