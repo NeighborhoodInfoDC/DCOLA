@@ -44,19 +44,25 @@ proc format;
     5 = 'Other race'
     6 = 'Multiple races';
 
-  value bpld_a
+  value bpld_a (notsorted) 
     00100-12092, 71040-71050, 90000-90022 = 'US & territories'
-    15000-19900, 29900, 29999 = 'Canada & other North America'
-    20000       = 'Mexico'
     21000-21090 = 'Central America'
-    25000-26095 = 'Caribbean'
-    30000-30091 = 'South America'
-    40000-49900 = 'Europe'
     50000-59900 = 'Asia'
-    71000-71039 = 'Pacific Islands'
+    40000-49900 = 'Europe'
     60000-60099 = 'Africa'
+    30000-30091 = 'South America'
+    25000-26095 = 'Caribbean'
+    20000       = 'Mexico'
+    15000-19900, 29900, 29999 = 'Canada & other North America'
+
+    /*
+    71000-71039 = 'Pacific Islands'
     70000-70020 = 'Australia & New Zealand'
     71090, 80000-80050 = 'Other non-US'
+    */
+
+    71000-71039, 70000-70020, 71090, 80000-80050 = 'Other non-US'
+
     95000-99900, . = 'Missing';
     
   value age_a
@@ -119,6 +125,10 @@ proc format;
     0 -< 100 = "Below federal poverty level"
     100 -< 200 = "Below 200% federal poverty level"
     200 - high = "200% federal poverty level or higher";
+
+  value incwwo
+    low-<0, 0<-high = "Yes, has this source of income"
+    0 = "No, does not have this source of income";
 
   value incwage_a
     low-<0 = "Loss (<$0)"
@@ -194,53 +204,19 @@ proc format;
     7 = "Graduate or professional school"
     0 = "Not in school";
     
-  value youth_disconnect_a (notsorted)
+  value youth_disconnect (notsorted)
     1 = "In school"
     2 = "HS diploma, at work, not in school"
     3 = "HS diploma, not at work, not in school"
     4 = "No HS diploma, at work, not in school"
     5 = "No HS diploma, not at work, not in school";
     
-run;
-
-proc tabulate data=DCOLA.Ipums_SOIAA_2018 format=comma12.0 noseps missing;
-  where year in ( 0, 2016 );
-  class year;
-  var total immigrant_1gen latino_1gen asianpi_1gen african_1gen otherimm_1gen;
-  weight perwt;
-  table 
-    /** Rows **/
-    total='Total population' 
-    immigrant_1gen='Immigrants (1st gen.)'
-    latino_1gen='Latinos' 
-    asianpi_1gen='Asian/Pacific Islanders' 
-    african_1gen='Africans' 
-    otherimm_1gen='Other immigrants',
-    /** Columns **/
-    sum='Persons' * year=' '
-    pctsum<total>='Percent' * year=' ' * f=comma12.1
-  ;
-  format year yeartbl. raceth raceth.;
-run;
-
-proc tabulate data=DCOLA.Ipums_SOIAA_2018 format=comma12.0 noseps missing;
-  where year in ( 0, 2016 ) and not( immigrant_1gen );
-  class year;
-  var total immigrant_2gen latino_2gen asianpi_2gen african_2gen otherimm_2gen;
-  weight perwt;
-  table 
-    /** Rows **/
-    total='Non-1gen immigrants' 
-    immigrant_2gen='Immigrants (2nd gen.)'
-    latino_2gen='Latinos' 
-    asianpi_2gen='Asian/Pacific Islanders' 
-    african_2gen='Africans' 
-    otherimm_2gen='Other immigrants',
-    /** Columns **/
-    sum='Persons' * year=' '
-    pctsum<total>='Percent' * year=' ' * f=comma12.1
-  ;
-  format year yeartbl. raceth raceth.;
+  value health_cov (notsorted)
+    1 = "No health insurance"
+    3 = "Has private health insurance only"
+    4 = "Has public health insurance only"
+    2 = "Has public and private health insurance";
+    
 run;
 
 /** Macro table - Start Definition **/
@@ -281,6 +257,17 @@ options missing='-';
 
 %macro All_tables( poppre=, lblpre= );
 
+  %local pop1gen pop2gen;
+
+  %if &poppre = aframerican %then %do;
+    %let pop1gen = &poppre;
+    %let pop2gen = 0;
+  %end;
+  %else %do;
+    %let pop1gen = &poppre._1gen;
+    %let pop2gen = &poppre._2gen;
+  %end;
+
   ods listing close;
 
   ods rtf file="&_dcdata_default_path\DCOLA\Prog\SOIAA2018\Tables_ipums_SOIAA_2018_&poppre..rtf" style=Styles.Rtf_arial_9pt
@@ -289,85 +276,168 @@ options missing='-';
   title1 "State of Immigrants Report, 2018";
   title2 "&lblpre";
 
-  footnote1 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
-      
+  footnote1 height=9pt j=l "Updated &fdate";
+  footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
+  
+  %if &poppre ~= aframerican %then %do;
+
+    ** Immmigrant overview tables **;
+    
+    proc tabulate data=DCOLA.Ipums_SOIAA_2018 format=comma12.0 noseps missing;
+      where year in ( 0, 2016 );
+      class year;
+      var total immigrant_1gen latino_1gen asianpi_1gen african_1gen otherimm_1gen;
+      weight perwt;
+      table 
+        /** Rows **/
+        total='Total population' 
+        immigrant_1gen='Immigrants (1st gen.)'
+        latino_1gen='Latinos' 
+        asianpi_1gen='Asian/Pacific Islanders' 
+        african_1gen='Africans' 
+        otherimm_1gen='Other immigrants',
+        /** Columns **/
+        sum='Persons' * year=' '
+        pctsum<total>='Percent' * year=' ' * f=comma12.1
+      ;
+      format year yeartbl.;
+    run;
+
+    proc tabulate data=DCOLA.Ipums_SOIAA_2018 format=comma12.0 noseps missing;
+      where year in ( 0, 2016 ) and not( immigrant_1gen );
+      class year;
+      var total immigrant_2gen latino_2gen asianpi_2gen african_2gen otherimm_2gen;
+      weight perwt;
+      table 
+        /** Rows **/
+        total='Non-1gen immigrants' 
+        immigrant_2gen='Immigrants (2nd gen.)'
+        latino_2gen='Latinos' 
+        asianpi_2gen='Asian/Pacific Islanders' 
+        african_2gen='Africans' 
+        otherimm_2gen='Other immigrants',
+        /** Columns **/
+        sum='Persons' * year=' '
+        pctsum<total>='Percent' * year=' ' * f=comma12.1
+      ;
+      format year yeartbl.;
+    run;
+    
+  %end;
+
   ** Demographics **;
 
-  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=bpld, byfmt=bpld_a., bylbl="\i % Country of origin" )
+  %if &poppre ~= aframerican %then %do;
+  
+    %if &poppre = immigrant %then %do;
 
-  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=citizen, byfmt=citizenf., bylbl="\i % Citizenship status" )
+      %table( pop=&pop1gen, poplbl="\b &lblpre", by=bpld, byfmt=bpld_a., bylbl="\i % Country of origin" )
+      
+    %end;
+    %else %do;
+    
+      %table( order=freq, pop=&pop1gen, poplbl="\b &lblpre", by=bpld, byfmt=bpld_f., bylbl="\i % Country of origin" )
+      
+    %end;
 
-  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=yrimmig, byfmt=yrimmig_a., bylbl="\i % Year immigrated to US" )
+    %table( pop=&pop1gen, poplbl="\b &lblpre", by=citizen, byfmt=citizenf., bylbl="\i % Citizenship status" )
 
-  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=yrsusa2, byfmt=yrsusa2_f., bylbl="\i % Years in US" )
+    %table( pop=&pop1gen, poplbl="\b &lblpre", by=yrimmig, byfmt=yrimmig_a., bylbl="\i % Year immigrated to US" )
 
-  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=age, byfmt=age_a., bylbl="\i % Age" )
+    %table( pop=&pop1gen, poplbl="\b &lblpre", by=yrsusa2, byfmt=yrsusa2_f., bylbl="\i % Years in US" )
 
-  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=sex, byfmt=sex_f., bylbl="\i % Sex" )
+    %table( pop=&pop1gen, poplbl="\b &lblpre", by=raceth, byfmt=raceth., bylbl="\i % Race/ethnicity (self-identified)" )
+    
+  %end;
 
-  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=raceth, byfmt=raceth., bylbl="\i % Race/ethnicity (self-identified)" )
+  %table( pop=&pop1gen, poplbl="\b &lblpre", by=age, byfmt=age_a., bylbl="\i % Age" )
+
+  %table( pop=&pop1gen, poplbl="\b &lblpre", by=sex, byfmt=sex_f., bylbl="\i % Sex" )
 
 
   ** Jobs and economic opportunity **;
 
-  %table( pop=&poppre._1gen, poplbl="\b &lblpre", by=poverty, byfmt=poverty_a., bylbl="\i % Poverty status" )
+  %table( pop=&pop1gen, poplbl="\b &lblpre", by=poverty, byfmt=poverty_a., bylbl="\i % Poverty status" )
 
-  %table( pop=&poppre._1gen and age >= 16, poplbl="\b &lblpre, 16+ years old", by=empstatd, byfmt=empstatd., bylbl="\i % Labor force status" )
+  %table( pop=&pop1gen and age >= 16, poplbl="\b &lblpre, 16+ years old", by=empstatd, byfmt=empstatd., bylbl="\i % Labor force status" )
 
-  %table( pop=&poppre._1gen and age >= 16 and empstatd ~= 30, poplbl="\b &lblpre, 16+ years old in labor force", by=empstatd, byfmt=empstatd., bylbl="\i % Employment status" )
+  %table( pop=&pop1gen and age >= 16 and empstatd ~= 30, poplbl="\b &lblpre, 16+ years old in labor force", by=empstatd, byfmt=empstatd., bylbl="\i % Employment status" )
 
-  %table( year1=., order=freq, pop=&poppre._1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="\b &lblpre, civilian workers 16+ years old", by=occ, byfmt=occ_a., bylbl="\i % Occupation" )
+  %table( year1=., order=freq, pop=&pop1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="\b &lblpre, civilian workers 16+ years old", by=occ, byfmt=occ_a., bylbl="\i % Occupation" )
 
-  %table( pop=&poppre._1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="\b &lblpre, civilian workers 16+ years old", by=trantime, byfmt=trantime_a., bylbl="\i % Travel time to work" )
+  %table( pop=&pop1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="\b &lblpre, civilian workers 16+ years old", by=trantime, byfmt=trantime_a., bylbl="\i % Travel time to work" )
 
-  %table( pop=&poppre._1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="\b &lblpre, civilian workers 16+ years old", by=tranwork, byfmt=tranwork_f., bylbl="\i % Means of travel to work" )
+  %table( pop=&pop1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="\b &lblpre, civilian workers 16+ years old", by=tranwork, byfmt=tranwork_f., bylbl="\i % Means of travel to work" )
 
-  %table( pop=&poppre._1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="\b &lblpre, civilian workers 16+ years old", by=incwage_2016, byfmt=incwage_a., bylbl="\i % Annual earnings/wages ($ 2016)" )
+  %table( pop=&pop1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="\b &lblpre, civilian workers 16+ years old", by=incwage_2016, byfmt=incwage_a., bylbl="\i % Annual earnings/wages ($ 2016)" )
 
-  %table( pop=&poppre._1gen and age >= 16 and incbus00_2016 ~= 0, poplbl="\b &lblpre, with business income", by=incbus00_2016, byfmt=incbus_a., bylbl="\i % Annual business income ($ 2016)" )
+  %table( pop=&pop1gen and age >= 16, poplbl="\b &lblpre, 16+ years old", by=incbus00_2016, byfmt=incwwo., bylbl="\i % With business income" )
 
-  %table( pop=&poppre._1gen and age >= 16 and incinvst_2016 ~= 0, poplbl="\b &lblpre, with investment income", by=incinvst_2016, byfmt=incbus_a., bylbl="\i % Annual investment income ($ 2016)" )
+  %table( pop=&pop1gen and age >= 16 and incbus00_2016 ~= 0, poplbl="\b &lblpre, 16+ years old with business income", by=incbus00_2016, byfmt=incbus_a., bylbl="\i % Annual business income ($ 2016)" )
 
-  %table( pop=&poppre._1gen and age >= 65, poplbl="\b &lblpre, 65+ years old", by=incretir_2016, byfmt=incwage_a., bylbl="\i % Annual retirement income ($ 2016)" )
+  %table( pop=&pop1gen and age >= 16, poplbl="\b &lblpre, 16+ years old", by=incinvst_2016, byfmt=incwwo., bylbl="\i % With investment income" )
+
+  %table( pop=&pop1gen and age >= 16 and incinvst_2016 ~= 0, poplbl="\b &lblpre, 16+ years old with investment income", by=incinvst_2016, byfmt=incbus_a., bylbl="\i % Annual investment income ($ 2016)" )
+
+  %table( pop=&pop1gen and age >= 65, poplbl="\b &lblpre, 65+ years old", by=incretir_2016, byfmt=incwwo., bylbl="\i % With retirement income" )
+
+  %table( pop=&pop1gen and age >= 65 and incretir_2016 ~= 0, poplbl="\b &lblpre, 65+ years old with retirement income", by=incretir_2016, byfmt=incwage_a., bylbl="\i % Annual retirement income ($ 2016)" )
 
 
   ** Housing **;
 
-  %table( pop=&poppre._1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not in group quarters", by=numprec, byfmt=numprec_a., bylbl="\i % Household size (persons)" )
+  %table( pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=numprec, byfmt=numprec_a., bylbl="\i % Household size (persons)" )
 
-  %table( pop=&poppre._1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not in group quarters", by=ownershpd, byfmt=ownershpd_f., bylbl="\i % Ownership of dwelling" )
+  %table( pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=ownershpd, byfmt=ownershpd_f., bylbl="\i % Ownership of dwelling" )
 
-  %table( pop=&poppre._1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not in group quarters", by=ownershpd, byfmt=ownershpd_a., bylbl="\i % Ownership of dwelling" )
+  %table( pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=ownershpd, byfmt=ownershpd_a., bylbl="\i % Ownership of dwelling" )
 
-  %table( pop=&poppre._1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not in group quarters", by=hhincome, byfmt=incwage_a., bylbl="\i % Household income" )
+  %table( pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=hhincome, byfmt=incwage_a., bylbl="\i % Household income" )
 
-  %table( pop=&poppre._1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not in group quarters", by=hud_inc, byfmt=hudinc., bylbl="\i % HUD income level" )
+  %table( pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=hud_inc, byfmt=hudinc., bylbl="\i % HUD income level" )
 
-  %table( pop=&poppre._1gen and not( missing( Rent_burden ) ), poplbl="\b &lblpre, renters with cash rent", by=Rent_burden, byfmt=Rent_burden., bylbl="\i % Income spent on rent" )
+  %table( pop=&pop1gen and not( missing( Rent_burden ) ), poplbl="\b &lblpre, renters with cash rent", by=Rent_burden, byfmt=Rent_burden., bylbl="\i % Income spent on rent" )
+  
+  
+  ** Health and human services **;
+  
+  %table( pop=&pop1gen and age >= 15, poplbl="\b &lblpre, 15+ years old", by=incwelfr_2016, byfmt=incwwo., bylbl="\i % With welfare benefits income" )
+
+  %table( pop=&pop1gen and age >= 15 and incwelfr_2016 ~= 0, poplbl="\b &lblpre, 15+ years old with welfare benefits income", by=incwelfr_2016, byfmt=incbus_a., bylbl="\i % Annual welfare benefits income ($ 2016)" )
+
+  %table( year1=., pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=foodstmp, byfmt=foodstmp_f., bylbl="\i % With SNAP (food stamp) benefits" )
+
+  %table( year1=., pop=&pop1gen, poplbl="\b &lblpre", by=health_cov, byfmt=health_cov., bylbl="\i % With health insurance coverage" )
+
+  %table( year1=., pop=&pop2gen, poplbl="\b &lblpre (2nd gen)", by=health_cov, byfmt=health_cov., bylbl="\i % With health insurance coverage" )
 
 
-  ** Language **;
+  %if &poppre ~= aframerican %then %do;
 
-  %table( year2=2015, pop=&poppre._1gen and age >= 5, poplbl="\b &lblpre, 5+ years old", by=languaged, byfmt=languaged_a., bylbl="\i % Language spoken" )
+    ** Language **;
 
-  %table( year2=2015, pop=&poppre._1gen and age >= 5, poplbl="\b &lblpre, 5+ years old", by=speakeng, byfmt=speakeng_f., bylbl="\i % English proficiency" )
+    %table( year2=2015, pop=&pop1gen and age >= 5, poplbl="\b &lblpre, 5+ years old", by=languaged, byfmt=languaged_a., bylbl="\i % Language spoken" )
 
-  %table( year2=2015, pop=&poppre._1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not in group quarters", by=lingisol, byfmt=lingisol_f., bylbl="\i % In linguistically isolated household" )
+    %table( year2=2015, pop=&pop1gen and age >= 5, poplbl="\b &lblpre, 5+ years old", by=speakeng, byfmt=speakeng_f., bylbl="\i % English proficiency" )
 
-  %table( year2=2015, pop=&poppre._2gen and age >= 5, poplbl="\b &lblpre (2nd gen), 5+ years old", by=languaged, byfmt=languaged_a., bylbl="\i % Language spoken" )
+    %table( year2=2015, pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=lingisol, byfmt=lingisol_f., bylbl="\i % Living in linguistically isolated household" )
 
-  %table( year2=2015, pop=&poppre._2gen and age >= 5, poplbl="\b &lblpre (2nd gen), 5+ years old", by=speakeng, byfmt=speakeng_f., bylbl="\i % English proficiency" )
+    %table( year2=2015, pop=&pop2gen and age >= 5, poplbl="\b &lblpre (2nd gen), 5+ years old", by=languaged, byfmt=languaged_a., bylbl="\i % Language spoken" )
 
-  %table( year2=2015, pop=&poppre._2gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre (2nd gen), not in group quarters", by=lingisol, byfmt=lingisol_f., bylbl="\i % Linguistically isolated" )
+    %table( year2=2015, pop=&pop2gen and age >= 5, poplbl="\b &lblpre (2nd gen), 5+ years old", by=speakeng, byfmt=speakeng_f., bylbl="\i % English proficiency" )
+
+    %table( year2=2015, pop=&pop2gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre (2nd gen), not living in group quarters", by=lingisol, byfmt=lingisol_f., bylbl="\i % Living in linguistically isolated household" )
+    
+  %end;
 
 
   ** Education **;
 
-  %table( pop=&poppre._1gen and age >= 18, poplbl="\b &lblpre, 18+ years", by=educ99, byfmt=educ99_a., bylbl="\i % Highest level of education" )
+  %table( pop=&pop1gen and age >= 18, poplbl="\b &lblpre, 18+ years old", by=educ99, byfmt=educ99_a., bylbl="\i % Highest level of education" )
 
-  %table( pop=&poppre._1gen and 3 <= age <= 18, poplbl="\b &lblpre, 3-18 years", by=gradeatt, byfmt=gradeatt_a., bylbl="\i % School attendance" )
+  %table( pop=&pop1gen and 3 <= age <= 18, poplbl="\b &lblpre, 3-18 years old", by=gradeatt, byfmt=gradeatt_a., bylbl="\i % School attendance" )
 
-  %table( pop=&poppre._1gen and 16 <= age <= 24, poplbl="\b &lblpre, 16-24 years", by=youth_disconnect, byfmt=youth_disconnect_a., bylbl="\i % Youth disconnection" )
+  %table( pop=&pop1gen and 16 <= age <= 24, poplbl="\b &lblpre, 16-24 years old", by=youth_disconnect, byfmt=youth_disconnect., bylbl="\i % Youth disconnection" )
 
 
   ods rtf close;
@@ -388,3 +458,5 @@ options missing='-';
 %All_tables( poppre=asianpi, lblpre=Asians/Pacific Islanders )
 
 %All_tables( poppre=african, lblpre=Africans )
+
+%All_tables( poppre=aframerican, lblpre=African Americans )
