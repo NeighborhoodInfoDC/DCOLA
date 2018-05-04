@@ -97,7 +97,7 @@ proc format;
     5000-5940 = "Office and administrative support"
     6005-6130 = "Farming, fishing, and forestry"
     6200-6940 = "Construction and extraction"
-    7000-7610 = "Installation, maintenance, and repair"
+    7000-7630 = "Installation, maintenance, and repair"
     7700-8965 = "Production"
     9000-9750 = "Transportation and material moving"
     9800-9830 = "Military specific"
