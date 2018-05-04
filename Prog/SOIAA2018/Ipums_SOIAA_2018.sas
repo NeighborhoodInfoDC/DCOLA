@@ -297,25 +297,42 @@ data Ipums_SOIAA_2018;
   if 16 <= age < 25 then do;
  
     if gradeatt > 0 then do;
-      youth_disconnect = 1;
+      youth_disconnect = 1;  /** 16-24, in school **/
     end;
     else do;
     
+      /** 16-24, not in school **/
+    
       if educ99 >= 10 then do;
         if empstatd in ( 10, 12, 14, 15 ) then
-          youth_disconnect = 2; /** 16-25, HS diploma, not in school, working **/
+          youth_disconnect = 2; /** HS diploma, working **/
         else 
-          youth_disconnect = 3; /** 16-25, HS diploma, not in school, not working **/
+          youth_disconnect = 3; /** HS diploma, not working **/
       end;
       else do;
         if empstatd in ( 10, 12, 14, 15 ) then
-          youth_disconnect = 4; /** 16-25, no HS diploma, not in school, working **/
+          youth_disconnect = 4; /** no HS diploma, working **/
         else 
-          youth_disconnect = 5; /** 16-25, no HS diploma, not in school, not working **/
+          youth_disconnect = 5; /** no HS diploma, not working **/
       end;        
       
     end;
      
+  end;
+  
+  ** Health insurance coverage **;
+  
+  if hcovany = 1 then do;
+    health_cov = 1; /** No insurance **/
+  end;
+  else if hcovany = 2 then do;
+    if hcovpriv = 2 then do;
+      if hcovpub = 2 then health_cov = 2;  /** Private + public insurance **/
+      else health_cov = 3;  /*** Private ins only **/ 
+    end;
+    else do;
+      health_cov = 4;  /** Public ins only **/
+    end;
   end;
 
   label
@@ -366,7 +383,7 @@ run;
   label="DC State of Immigrants/African Americans report 2018, IPUMS",
   sortby=year serial pernum,
   printobs=5,
-  freqvars=year hud_inc raceth,
+  freqvars=year hud_inc raceth youth_disconnect health_cov,
   revisions=%str(New file.)
 )
 
@@ -385,7 +402,7 @@ proc freq data=A_w_parents;
   tables bpld_mom bpld_pop;
 run;
 
-** Check immigrant and race/ethnicity codings **;
+** Check new variable codings **;
 
 proc freq data=Ipums_SOIAA_2018;
   tables citizen * bpld / missing list;
@@ -408,5 +425,10 @@ proc freq data=Ipums_SOIAA_2018;
   where year in ( 0, 2016 ) and 16 <= age <= 24;
   tables educ99 * gradeatt * empstatd * youth_disconnect / missing list nocum nopercent;
   format educ99 educ99_b. gradeatt gradeatt_b.;
+run;
+
+proc freq data=Ipums_SOIAA_2018;
+  where year in ( 2016 );
+  tables hcovany * hcovpriv * hcovpub * health_cov / missing list nocum nopercent;
 run;
 
