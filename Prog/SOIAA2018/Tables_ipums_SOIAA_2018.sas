@@ -240,7 +240,7 @@ run;
 
 %macro table( year1=0, year2=2016, order=data, pop=, poplbl=, by=, bylbl=, byfmt= );
 
-  proc tabulate data=DCOLA.Ipums_SOIAA_2018 format=comma12.0 noseps missing;
+  proc tabulate data=Tables format=comma12.0 noseps missing;
     where year in ( &year1, &year2 ) and (&pop);
     class year;
     class &by / preloadfmt order=&order;
@@ -272,9 +272,12 @@ options missing='-';
 
 /** Macro All_tables - Start Definition **/
 
-%macro All_tables( poppre=, lblpre= );
+%macro All_tables( poppre=, lblpre=, geo= );
 
-  %local pop1gen pop2gen;
+  %local pop1gen pop2gen geoselect geolbl;
+  
+  %let poppre = %lowcase( &poppre );
+  %let geo = %lowcase( &geo );
 
   %if &poppre = aframerican or &poppre = total %then %do;
     %let pop1gen = &poppre;
@@ -284,24 +287,47 @@ options missing='-';
     %let pop1gen = &poppre._1gen;
     %let pop2gen = &poppre._2gen;
   %end;
+  
+  %if &geo = dc %then %do;
+    %let geoselect = (statefip = 11);
+    %let geolbl = District of Columbia;
+  %end;
+  %else %if &geo = suburbs %then %do;
+    %let geoselect = (statefip ~= 11);
+    %let geolbl = Washington metro area excluding DC;
+  %end;
+  %else %do;
+    %let geoselect = 1;
+    %let geolbl = Washington metro area (including DC);
+  %end;
+  
+  ** Create table data subset **;
+  
+  data Tables;
+  
+    set DCOLA.Ipums_SOIAA_2018;
+    
+    where &geoselect;
+    
+  run;
 
   ods listing close;
 
-  ods rtf file="&_dcdata_default_path\DCOLA\Prog\SOIAA2018\Tables_ipums_SOIAA_2018_&poppre..rtf" style=Styles.Rtf_arial_9pt
+  ods rtf file="&_dcdata_default_path\DCOLA\Prog\SOIAA2018\Tables_ipums_SOIAA_2018_&poppre._&geo..rtf" style=Styles.Rtf_arial_9pt
       /*bodytitle*/;
       
   title1 "State of Immigrants Report, 2018";
-  title2 "&lblpre";
+  title2 "&lblpre, &geolbl";
   title3 " ";
 
   footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
   footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
 
-  %if &poppre ~= aframerican and &poppre ~= total %then %do;
+  %if &poppre = immigrant %then %do;
 
     title4 "\i Immmigrant population overview";
     
-    proc tabulate data=DCOLA.Ipums_SOIAA_2018 format=comma12.0 noseps missing;
+    proc tabulate data=Tables format=comma12.0 noseps missing;
       where year in ( 0, 2016 );
       class year;
       var total immigrant_1gen latino_1gen asianpi_1gen african_1gen otherimm_1gen;
@@ -321,7 +347,7 @@ options missing='-';
       format year yeartbl.;
     run;
 
-    proc tabulate data=DCOLA.Ipums_SOIAA_2018 format=comma12.0 noseps missing;
+    proc tabulate data=Tables format=comma12.0 noseps missing;
       where year in ( 0, 2016 ) and not( immigrant_1gen );
       class year;
       var total immigrant_2gen latino_2gen asianpi_2gen african_2gen otherimm_2gen;
@@ -478,21 +504,27 @@ options missing='-';
 
   title1;
   footnote1;
+  
+  proc datasets library=work nolist;
+    delete Tables /memtype=data;
+  quit;
 
 %mend All_tables;
 
 /** End Macro Definition **/
 
 
-%All_tables( poppre=immigrant, lblpre=Immigrants )
+%All_tables( poppre=immigrant, lblpre=Immigrants, geo=dc )
 
-%All_tables( poppre=latino, lblpre=Latinos )
+%All_tables( poppre=immigrant, lblpre=Immigrants, geo=suburbs )
 
-%All_tables( poppre=asianpi, lblpre=Asians/Pacific Islanders )
+%All_tables( poppre=latino, lblpre=Latinos, geo=dc )
 
-%All_tables( poppre=african, lblpre=Africans )
+%All_tables( poppre=asianpi, lblpre=Asians/Pacific Islanders, geo=dc )
 
-%All_tables( poppre=aframerican, lblpre=African Americans )
+%All_tables( poppre=african, lblpre=Africans, geo=dc )
 
-%All_tables( poppre=total, lblpre=Total DC population )
+%All_tables( poppre=aframerican, lblpre=African Americans, geo=dc )
+
+%All_tables( poppre=total, lblpre=Total population, geo=dc )
 
