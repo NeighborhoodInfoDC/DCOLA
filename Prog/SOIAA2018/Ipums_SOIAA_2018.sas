@@ -22,7 +22,7 @@
 %DCData_lib( IPUMS )
 
 %let ipums_keep_a = 
-  year serial pernum hhwt perwt gq bpld momloc poploc
+  statefip year upuma serial pernum hhwt perwt gq bpld momloc poploc
   citizen raced hispand age speakeng lingisol;
   
 %let ipums_keep_b =
@@ -31,17 +31,96 @@
   trantime tranwork uhrswork valueh 
   ftotinc inctot incwelfr incwage incbus00 incinvst incretir;
 
+proc format;
+  value $upuma2000_to_met2013f
+    '1100101' = '47900'
+    '1100102' = '47900'
+    '1100103' = '47900'
+    '1100104' = '47900'
+    '1100105' = '47900'
+    '2400300' = '47900'
+    '2401001' = '47900'
+    '2401002' = '47900'
+    '2401003' = '47900'
+    '2401004' = '47900'
+    '2401005' = '47900'
+    '2401006' = '47900'
+    '2401007' = '47900'
+    '2401101' = '47900'
+    '2401102' = '47900'
+    '2401103' = '47900'
+    '2401104' = '47900'
+    '2401105' = '47900'
+    '2401106' = '47900'
+    '2401107' = '47900'
+    '2401500' = '47900'
+    '2401600' = '47900'
+    '5100100' = '47900'
+    '5100200' = '47900'
+    '5100301' = '47900'
+    '5100302' = '47900'
+    '5100303' = '47900'
+    '5100304' = '47900'
+    '5100305' = '47900'
+    '5100501' = '47900'
+    '5100502' = '47900'
+    '5100600' = '47900'
+    '5100700' = '47900'
+    '5100800' = '47900'
+    '5100900' = '47900'
+    '5400400' = '47900'
+    other = ' ';
+run;
+
 data A;
 
   set
     Ipums.Ipums_2000_dc
-      (keep=&ipums_keep_a &ipums_keep_b languagd educ99 ownershd 
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b languagd educ99 ownershd 
        rename=(languagd=languaged ownershd=ownershpd yrimmig=yrimmig00))
-    Ipums.Acs_2011_15_dc                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (keep=&ipums_keep_a languaged)
-    Ipums.Acs_2012_16_dc
-      (keep=&ipums_keep_a &ipums_keep_b hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype);
 
+    Ipums.Ipums_2000_md
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b languagd educ99 ownershd 
+       rename=(languagd=languaged ownershd=ownershpd yrimmig=yrimmig00)
+       where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+
+    Ipums.Ipums_2000_va
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b languagd educ99 ownershd 
+       rename=(languagd=languaged ownershd=ownershpd yrimmig=yrimmig00)
+       where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+
+    Ipums.Ipums_2000_wv
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b languagd educ99 ownershd 
+       rename=(languagd=languaged ownershd=ownershpd yrimmig=yrimmig00)
+       where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+
+    Ipums.Acs_2011_15_dc                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
+      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged)
+    Ipums.Acs_2012_16_dc
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype)
+
+    Ipums.Acs_2011_15_md                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
+      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged
+       where=(met2013=47900))
+    Ipums.Acs_2012_16_md
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
+       where=(met2013=47900))
+
+    Ipums.Acs_2011_15_va                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
+      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged
+       where=(met2013=47900))
+    Ipums.Acs_2012_16_va
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
+       where=(met2013=47900))
+
+    Ipums.Acs_2011_15_wv                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
+      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged
+       where=(upuma='5400400'))
+    Ipums.Acs_2012_16_wv
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
+       where=(upuma='5400400'))
+  ;
+  
 run;
 
 
@@ -383,9 +462,13 @@ run;
   label="DC State of Immigrants/African Americans report 2018, IPUMS",
   sortby=year serial pernum,
   printobs=5,
-  freqvars=year hud_inc raceth youth_disconnect health_cov,
+  freqvars=hud_inc raceth youth_disconnect health_cov,
   revisions=%str(New file.)
 )
+
+proc freq data=Ipums_SOIAA_2018;
+  tables year * statefip / list missing;
+run;
 
 ** Check mother/father matching results **;
 
@@ -399,12 +482,14 @@ proc print data=Ipums_SOIAA_2018;
 run;
 
 proc freq data=A_w_parents;
+  where statefip = 11;
   tables bpld_mom bpld_pop;
 run;
 
 ** Check new variable codings **;
 
 proc freq data=Ipums_SOIAA_2018;
+  where statefip = 11;
   tables citizen * bpld / missing list;
   tables immigrant_1gen * immigrant_2gen / missing list;
   tables immigrant_1gen * citizen / missing list;
@@ -422,13 +507,13 @@ proc format;
     1-high = 'In school';
 
 proc freq data=Ipums_SOIAA_2018;
-  where year in ( 0, 2016 ) and 16 <= age <= 24;
+  where statefip = 11 and year in ( 0, 2016 ) and 16 <= age <= 24;
   tables educ99 * gradeatt * empstatd * youth_disconnect / missing list nocum nopercent;
   format educ99 educ99_b. gradeatt gradeatt_b.;
 run;
 
 proc freq data=Ipums_SOIAA_2018;
-  where year in ( 2016 );
+  where statefip = 11 and year in ( 2016 );
   tables hcovany * hcovpriv * hcovpub * health_cov / missing list nocum nopercent;
 run;
 
