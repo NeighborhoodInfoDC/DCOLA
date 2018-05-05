@@ -27,8 +27,8 @@
   
 %let ipums_keep_b =
   numprec hhincome diff: empstatd gradeatt ind occ labforce 
-  poverty rentgrs school sex speakeng trantime tranwork
-  uhrswork valueh yrimmig yrsusa1 yrsusa2
+  poverty rentgrs school sex speakeng yrimmig yrsusa1 yrsusa2
+  trantime tranwork uhrswork valueh 
   ftotinc inctot incwelfr incwage incbus00 incinvst incretir;
 
 data A;
@@ -40,7 +40,7 @@ data A;
     Ipums.Acs_2011_15_dc                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
       (keep=&ipums_keep_a languaged)
     Ipums.Acs_2012_16_dc
-      (keep=&ipums_keep_a &ipums_keep_b hud_inc hcov: educd foodstmp owncost ownershpd yrnatur);
+      (keep=&ipums_keep_a &ipums_keep_b hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype);
 
 run;
 
