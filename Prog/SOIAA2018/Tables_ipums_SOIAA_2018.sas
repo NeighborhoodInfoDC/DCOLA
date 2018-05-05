@@ -75,6 +75,13 @@ proc format;
     65 -< 75 = '65 - 74'
     75 - high = '75 or older';
     
+  value empstatd_a (notsorted)
+    10, 12 = "At work/has job"
+    14, 15 = "In armed forces"
+    20 = "Unemployed"
+    30 = "Not in labor force"
+    0 = "N/A";
+        
   value occ_a
     0, .n = "N/A"
     10-420, 430 = "Management, business, science, and arts"
@@ -122,23 +129,25 @@ proc format;
     50-high = "50% or more";
     
   value poverty_a
-    0 -< 100 = "Below federal poverty level"
+    0 -< 100 = "Below federal poverty level (poverty rate)"
     100 -< 200 = "Below 200% federal poverty level"
     200 - high = "200% federal poverty level or higher";
 
   value incwwo
+    .n,. = "N/A"
     low-<0, 0<-high = "Yes, has this source of income"
     0 = "No, does not have this source of income";
 
   value incwage_a
-    low-<0 = "Loss (<$0)"
-    0 = "None ($0)"
-    0<-<25000 = "Under $25,000"
+    .,.n = "N/A"
+    low-<10000 = "Under $10,000"
+    10000-<25000 = "$10,000 - 24,999"
     25000-<50000 = "$25,000 - 49,999"
     50000-<100000 = "$50,000 - 99,999"
     100000-high = "$100,000 or more";
     
   value incbus_a
+    .,.n = "N/A"
     low-<0 = "Loss (<$0)"
     0 = "None ($0)"
     0<-<5000 = "Under $5,000"
@@ -188,11 +197,19 @@ proc format;
    09="12th grade, no diploma"
    10="High school graduate, or GED"
    11="Some college, no degree"
-   12-13="Associate degree"
-   14="Bachelors degree"
-   15="Masters degree"
+   12-13="Associate's degree"
+   14="Bachelor's degree"
+   15="Master's degree"
    16="Professional degree"
    17="Doctorate degree";
+
+  value educ99_b
+   01-05="8th grade or less"
+   06-09="9th - 12th grade, no diploma"
+   10-11="High school graduate, or GED"
+   12-13="Associate's degree"
+   14="Bachelor's degree"
+   15-17="Master's degree or higher";
 
   value gradeatt_a (notsorted)
     1 = "Nursery school/preschool"
@@ -259,7 +276,7 @@ options missing='-';
 
   %local pop1gen pop2gen;
 
-  %if &poppre = aframerican %then %do;
+  %if &poppre = aframerican or &poppre = total %then %do;
     %let pop1gen = &poppre;
     %let pop2gen = 0;
   %end;
@@ -275,13 +292,14 @@ options missing='-';
       
   title1 "State of Immigrants Report, 2018";
   title2 "&lblpre";
+  title3 " ";
 
-  footnote1 height=9pt j=l "Updated &fdate";
+  footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
   footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
-  
-  %if &poppre ~= aframerican %then %do;
 
-    ** Immmigrant overview tables **;
+  %if &poppre ~= aframerican and &poppre ~= total %then %do;
+
+    title4 "\i Immmigrant population overview";
     
     proc tabulate data=DCOLA.Ipums_SOIAA_2018 format=comma12.0 noseps missing;
       where year in ( 0, 2016 );
@@ -325,9 +343,10 @@ options missing='-';
     
   %end;
 
-  ** Demographics **;
 
-  %if &poppre ~= aframerican %then %do;
+  title4 "\i Demographics";
+
+  %if &poppre ~= aframerican and &poppre ~= total %then %do;
   
     %if &poppre = immigrant %then %do;
 
@@ -352,16 +371,22 @@ options missing='-';
 
   %table( pop=&pop1gen, poplbl="\b &lblpre", by=age, byfmt=age_a., bylbl="\i % Age" )
 
-  %table( pop=&pop1gen, poplbl="\b &lblpre", by=sex, byfmt=sex_f., bylbl="\i % Sex" )
+  %table( pop=&pop2gen, poplbl="\b &lblpre (2nd gen)", by=age, byfmt=age_a., bylbl="\i % Age" )
+
+  %table( pop=&pop1gen and sex=2, poplbl="\b &lblpre, female", by=age, byfmt=age_a., bylbl="\i % Age" )
+
+  %table( pop=&pop1gen and sex=1, poplbl="\b &lblpre, male", by=age, byfmt=age_a., bylbl="\i % Age" )
+
+  %table( year1=., pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=hhtype, byfmt=hhtype_f., bylbl="\i % Household type" )
 
 
-  ** Jobs and economic opportunity **;
+  title4 "\i Jobs and economic opportunity";
 
   %table( pop=&pop1gen, poplbl="\b &lblpre", by=poverty, byfmt=poverty_a., bylbl="\i % Poverty status" )
 
-  %table( pop=&pop1gen and age >= 16, poplbl="\b &lblpre, 16+ years old", by=empstatd, byfmt=empstatd., bylbl="\i % Labor force status" )
+  %table( pop=&pop1gen and 16 <= age and empstatd in ( 10, 12, 20, 30 ), poplbl="\b &lblpre, civilians 16+ years old", by=empstatd, byfmt=empstatd_a., bylbl="\i % Labor force status" )
 
-  %table( pop=&pop1gen and age >= 16 and empstatd ~= 30, poplbl="\b &lblpre, 16+ years old in labor force", by=empstatd, byfmt=empstatd., bylbl="\i % Employment status" )
+  %table( pop=&pop1gen and age >= 16 and empstatd in ( 10, 12, 20 ), poplbl="\b &lblpre, civilians 16+ years old in labor force", by=empstatd, byfmt=empstatd_a., bylbl="\i % Employment status (unemployment rate)" )
 
   %table( year1=., order=freq, pop=&pop1gen and age >= 16 and empstatd in ( 10, 12 ), poplbl="\b &lblpre, civilian workers 16+ years old", by=occ, byfmt=occ_a., bylbl="\i % Occupation" )
 
@@ -384,7 +409,7 @@ options missing='-';
   %table( pop=&pop1gen and age >= 65 and incretir_2016 ~= 0, poplbl="\b &lblpre, 65+ years old with retirement income", by=incretir_2016, byfmt=incwage_a., bylbl="\i % Annual retirement income ($ 2016)" )
 
 
-  ** Housing **;
+  title4 "\i Housing";
 
   %table( pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=numprec, byfmt=numprec_a., bylbl="\i % Household size (persons)" )
 
@@ -392,14 +417,14 @@ options missing='-';
 
   %table( pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=ownershpd, byfmt=ownershpd_a., bylbl="\i % Ownership of dwelling" )
 
-  %table( pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=hhincome, byfmt=incwage_a., bylbl="\i % Household income" )
+  %table( pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=hhincome_2016, byfmt=incwage_a., bylbl="\i % Household income ($ 2016)" )
 
   %table( pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=hud_inc, byfmt=hudinc., bylbl="\i % HUD income level" )
 
   %table( pop=&pop1gen and not( missing( Rent_burden ) ), poplbl="\b &lblpre, renters with cash rent", by=Rent_burden, byfmt=Rent_burden., bylbl="\i % Income spent on rent" )
   
   
-  ** Health and human services **;
+  title4 "\i Health and human services";
   
   %table( pop=&pop1gen and age >= 15, poplbl="\b &lblpre, 15+ years old", by=incwelfr_2016, byfmt=incwwo., bylbl="\i % With welfare benefits income" )
 
@@ -412,9 +437,9 @@ options missing='-';
   %table( year1=., pop=&pop2gen, poplbl="\b &lblpre (2nd gen)", by=health_cov, byfmt=health_cov., bylbl="\i % With health insurance coverage" )
 
 
-  %if &poppre ~= aframerican %then %do;
+  %if &poppre ~= aframerican and &poppre ~= total %then %do;
 
-    ** Language **;
+    title4 "\i Language";
 
     %table( year2=2015, pop=&pop1gen and age >= 5, poplbl="\b &lblpre, 5+ years old", by=languaged, byfmt=languaged_a., bylbl="\i % Language spoken" )
 
@@ -431,13 +456,21 @@ options missing='-';
   %end;
 
 
-  ** Education **;
+  title4 "\i Education";
 
-  %table( pop=&pop1gen and age >= 18, poplbl="\b &lblpre, 18+ years old", by=educ99, byfmt=educ99_a., bylbl="\i % Highest level of education" )
+  %table( pop=&pop1gen and age >= 18, poplbl="\b &lblpre, 18+ years old", by=educ99, byfmt=educ99_b., bylbl="\i % Highest level of education" )
 
-  %table( pop=&pop1gen and 3 <= age <= 18, poplbl="\b &lblpre, 3-18 years old", by=gradeatt, byfmt=gradeatt_a., bylbl="\i % School attendance" )
+  %table( pop=&pop1gen and 3 <= age < 18 and educ99 < 10, poplbl="\b &lblpre, 3-17 years old not HS graduate", by=gradeatt, byfmt=gradeatt_a., bylbl="\i % School attendance" )
+
+  %table( pop=&pop1gen and 3 <= age < 18 and educ99 < 10 and gradeatt = 0, poplbl="\b &lblpre, 3-17 years old not HS graduate and not in school", by=age, byfmt=age_f., bylbl="\i % Age" )
+
+  %table( pop=&pop2gen and 3 <= age < 18 and educ99 < 10, poplbl="\b &lblpre (2nd gen), 3-17 years old not HS graduate", by=gradeatt, byfmt=gradeatt_a., bylbl="\i % School attendance" )
+
+  %table( pop=&pop2gen and 3 <= age < 18 and educ99 < 10 and gradeatt = 0, poplbl="\b &lblpre (2nd gen), 3-17 years old not HS graduate and not in school", by=age, byfmt=age_f., bylbl="\i % Age" )
 
   %table( pop=&pop1gen and 16 <= age <= 24, poplbl="\b &lblpre, 16-24 years old", by=youth_disconnect, byfmt=youth_disconnect., bylbl="\i % Youth disconnection" )
+
+  %table( pop=&pop2gen and 16 <= age <= 24, poplbl="\b &lblpre (2nd gen), 16-24 years old", by=youth_disconnect, byfmt=youth_disconnect., bylbl="\i % Youth disconnection" )
 
 
   ods rtf close;
@@ -460,3 +493,6 @@ options missing='-';
 %All_tables( poppre=african, lblpre=Africans )
 
 %All_tables( poppre=aframerican, lblpre=African Americans )
+
+%All_tables( poppre=total, lblpre=Total DC population )
+
