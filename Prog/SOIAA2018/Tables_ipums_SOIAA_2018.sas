@@ -467,13 +467,25 @@ options missing='-';
 
     title4 "\i Language";
 
-    %table( year2=2015, pop=&pop1gen and age >= 5, poplbl="\b &lblpre, 5+ years old", by=languaged, byfmt=languaged_a., bylbl="\i % Language spoken" )
+    %table( year2=2015, pop=&pop1gen and age >= 5, poplbl="\b &lblpre, 5+ years old", by=languaged, byfmt=languaged_a., bylbl="\i % Language spoken (condensed)" )
+    
+    %if &poppre ~= immigrant %then %do;
+
+      %table( order=freq, year2=2015, pop=&pop1gen and age >= 5, poplbl="\b &lblpre, 5+ years old", by=languaged, byfmt=languaged_f., bylbl="\i % Language spoken (detailed)" )
+    
+    %end;
 
     %table( year2=2015, pop=&pop1gen and age >= 5, poplbl="\b &lblpre, 5+ years old", by=speakeng, byfmt=speakeng_f., bylbl="\i % English proficiency" )
 
     %table( year2=2015, pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=lingisol, byfmt=lingisol_f., bylbl="\i % Living in linguistically isolated household" )
+    
+    %table( year2=2015, pop=&pop2gen and age >= 5, poplbl="\b &lblpre (2nd gen), 5+ years old", by=languaged, byfmt=languaged_a., bylbl="\i % Language spoken (condensed)" )
 
-    %table( year2=2015, pop=&pop2gen and age >= 5, poplbl="\b &lblpre (2nd gen), 5+ years old", by=languaged, byfmt=languaged_a., bylbl="\i % Language spoken" )
+    %if &poppre ~= immigrant %then %do;
+
+      %table( order=freq, year2=2015, pop=&pop2gen and age >= 5, poplbl="\b &lblpre (2nd gen), 5+ years old", by=languaged, byfmt=languaged_f., bylbl="\i % Language spoken (detailed)" )
+    
+    %end;
 
     %table( year2=2015, pop=&pop2gen and age >= 5, poplbl="\b &lblpre (2nd gen), 5+ years old", by=speakeng, byfmt=speakeng_f., bylbl="\i % English proficiency" )
 
