@@ -22,6 +22,22 @@ proc format;
   value $statecd_a 
     '11' = "District of Columbia"
     other = "Suburbs";
+run;
+
+%fdate()
+
+ods listing close;
+
+ods rtf file="&_dcdata_default_path\DCOLA\Prog\SOIAA2018\Tables_ncdb_SOIAA_2018.rtf" style=Styles.Rtf_arial_9pt
+    /*bodytitle*/;
+    
+title1 "State of Immigrants Report, 2018";
+title2 "Historical population";
+title3 " ";
+
+footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
+footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
+
 
 proc tabulate data=NCDB.NCDB_master_update format=comma12.0 noseps missing;
   class statecd;
@@ -43,6 +59,10 @@ proc tabulate data=NCDB.NCDB_master_update format=comma12.0 noseps missing;
     ( forborn7='1970' forborn8='1980' forborn9='1990' forborn0='2000' forborn1a='2006-10' )
   ;
   format statecd $statecd_a.;
-
-
 run;
+
+ods rtf close;
+ods listing;
+
+title1;
+footnote1;
