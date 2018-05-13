@@ -54,7 +54,13 @@ run;
 
     Exposure rate of group G is calculated as 
 
-      Exposure = ( ( GPop / TotalPop ) * Crimes ) / GPop_sum
+      Exposure = 1000 * ( ( GPop / TotalPop ) * Crimes ) / GPop_sum
+      
+    where GPop is the tract population of group G, GPop_sum is the total of GPop 
+    across all tracts, TotalPop is the total tract population, and Crimes are the
+    number of crimes (of a given type) in the tract. 
+    
+    Summing Exposure over all tracts gives the effective crime rate per 1,000 pop.
 %************************************************************************************;
 
 %macro Crime_exp( years=, crimes=, groups= );
