@@ -19,6 +19,8 @@
 %DCData_lib( ACS )
 %DCData_lib( Police )
 
+** Combine tract-level population and crime data **;
+
 data A;
 
   merge
@@ -41,28 +43,75 @@ data A;
 
 run;
 
-%File_info( data=A, printobs=0, freqvars=geo2010 )
-
 proc summary data=A;
   var TotalPop Forborn Latino Asianpi African Natborn White_nb Black_nb Crimes_pt1_2017 Crimes_pt1_violent_2017;
   output out=A_sum sum= / autolabel autoname;
 run;
 
-%File_info( data=A_sum, printobs=0 )
 
-%macro Crime_exp( total=TotalPop, crimes= );
+%************************************************************************************
+    Calculate crime exposure rate
 
-  Crime_rate_&crimes. = Crimes_&crimes. / TotalPop_sum;
+    Exposure rate of group G is calculated as 
+
+      Exposure = ( ( GPop / TotalPop ) * Crimes ) / GPop_sum
+%************************************************************************************;
+
+%macro Crime_exp( years=, crimes=, groups= );
+
+  %local i y j v k g;
   
-  Latino_exp_&crimes. = ( ( ( Latino / TotalPop ) * Crimes_&crimes. ) / ( Latino_sum / TotalPop_sum ) ) / TotalPop_sum;
-  Asianpi_exp_&crimes. = ( ( ( Asianpi / TotalPop ) * Crimes_&crimes. ) / ( Asianpi_sum / TotalPop_sum ) ) / TotalPop_sum;
-  African_exp_&crimes. = ( ( ( African / TotalPop ) * Crimes_&crimes. ) / ( African_sum / TotalPop_sum ) ) / TotalPop_sum;
-
-  Natborn_exp_&crimes. = ( ( ( Natborn / TotalPop ) * Crimes_&crimes. ) / ( Natborn_sum / TotalPop_sum ) ) / TotalPop_sum;
-  White_nb_exp_&crimes. = ( ( ( White_nb / TotalPop ) * Crimes_&crimes. ) / ( White_nb_sum / TotalPop_sum ) ) / TotalPop_sum;
-  Black_nb_exp_&crimes. = ( ( ( Black_nb / TotalPop ) * Crimes_&crimes. ) / ( Black_nb_sum / TotalPop_sum ) ) / TotalPop_sum;
+  %let crimes = %lowcase( &crimes );
+  %let groups = %lowcase( &groups );
   
+  %let i = 1;
+  %let y = %scan( &years, &i );
+
+  %do %until ( &y = );
+  
+    Year = &y;
+
+    %let j = 1;
+    %let v = %scan( &crimes, &j );
+
+    %do %until ( &v = );
+    
+      Crimes = "&v";
+      Group = "total";
+
+      Exposure = 1000 * Crimes_&v._&y / TotalPop_sum;
+
+      output;
+
+      %let k = 1;
+      %let g = %scan( &groups, &k );
+
+      %do %until ( &g = );
+
+        Group = "&g";
+        
+        Exposure = 1000 * ( ( ( &g / TotalPop ) * Crimes_&v._&y ) / &g._sum );
+
+        output;
+
+        %let k = %eval( &k + 1 );
+        %let g = %scan( &groups, &k );
+
+      %end;
+
+      %let j = %eval( &j + 1 );
+      %let v = %scan( &crimes, &j );
+
+    %end;
+
+    %let i = %eval( &i + 1 );
+    %let y = %scan( &years, &i );
+
+  %end;
+
 %mend Crime_exp;
+
+** Create data for calculating exposure indices **;
 
 data Crime_exposure_SOIAA_2018;
 
@@ -70,70 +119,77 @@ data Crime_exposure_SOIAA_2018;
   
   if _n_ = 1 then set A_sum;  ** Merge sum vars with all tract records **;
   
-  %Crime_exp( crimes=pt1_2017 )
-  %Crime_exp( crimes=pt1_violent_2017 )
-  %Crime_exp( crimes=pt1_property_2017 )
+  length Crimes Group $ 40;
   
-  %Crime_exp( crimes=pt1_2012 )
-  %Crime_exp( crimes=pt1_violent_2012 )
-  %Crime_exp( crimes=pt1_property_2012 )
+  %Crime_exp( years=2012 2017, crimes=pt1 pt1_violent pt1_property, groups=Latino AsianPi African Natborn black_nb white_nb )
+  
+  keep Geo2010 Year Crimes Group Exposure;
   
 run;
 
-%File_info( data=Crime_exposure_SOIAA_2018, printobs=0 )
+%File_info( data=Crime_exposure_SOIAA_2018, printobs=40, freqvars=year crimes group )
 
-ods rtf file="D:\DCData\Libraries\DCOLA\Prog\SOIAA2018\Crime_exposure_SOIAA_2018.rtf" style=Styles.Rtf_arial_9pt;
-ods startpage=no;
+proc format;
 
-proc tabulate data=Crime_exposure_SOIAA_2018 format=comma12.4 noseps missing;
-  var 
-    Crime_rate_: Latino_exp_: Asianpi_exp_: African_exp_: Natborn_exp_: White_nb_exp_: Black_nb_exp_:
-   ;
-  table 
-    sum='Exposure to pt 1 crimes, 2017' * (
-      Crime_rate_pt1_2017='Total population'
-      Latino_exp_pt1_2017='Latino immigrants'
-      Natborn_exp_pt1_2017='Native born population'
-    );
-  table
-    sum='Exposure to violent crimes, 2017' * (
-      Crime_rate_pt1_violent_2017='Total population'
-      Latino_exp_pt1_violent_2017='Latino immigrants'
-      Natborn_exp_pt1_violent_2017='Native born population'
-    );
-  table
-    sum='Exposure to property crimes, 2017' * (
-      Crime_rate_pt1_property_2017='Total population'
-      Latino_exp_pt1_property_2017='Latino immigrants'
-      Natborn_exp_pt1_property_2017='Native born population'
-    );
+  value $group (notsorted)
+    'total' = 'Total population'
+    'latino' = 'Latino immigrants'
+    'asianpi' = 'Asian/PI immigrants'
+    'african' = 'African immigrants'
+    'natborn' = 'Native born population'
+    'black_nb' = 'African Americans'
+    'white_nb' = 'Non-Latino whites';
+    
+  value $crimes (notsorted)
+    'pt1' = 'All crimes'
+    'pt1_violent' = 'Violent crimes'
+    'pt1_property' = 'Property crimes';
+    
 run;
 
-proc tabulate data=Crime_exposure_SOIAA_2018 format=comma12.4 noseps missing;
-  var 
-    Crime_rate_: Latino_exp_: Asianpi_exp_: African_exp_: Natborn_exp_: White_nb_exp_: Black_nb_exp_:
-   ;
-  table 
-    sum='Exposure to pt 1 crimes, 2012' * (
-      Crime_rate_pt1_2012='Total population'
-      Latino_exp_pt1_2012='Latino immigrants'
-      Natborn_exp_pt1_2012='Native born population'
-    );
-  table
-    sum='Exposure to violent crimes, 2012' * (
-      Crime_rate_pt1_violent_2012='Total population'
-      Latino_exp_pt1_violent_2012='Latino immigrants'
-      Natborn_exp_pt1_violent_2012='Native born population'
-    );
-  table
-    sum='Exposure to property crimes, 2012' * (
-      Crime_rate_pt1_property_2012='Total population'
-      Latino_exp_pt1_property_2012='Latino immigrants'
-      Natborn_exp_pt1_property_2012='Native born population'
-    );
-run;
 
-ods startpage=now;
+** Create summary tables **;
+
+%macro table( select= );
+
+  proc tabulate data=Crime_exposure_SOIAA_2018 format=comma12.2 noseps missing;
+    where group in ( &select );
+    var Exposure;
+    class Year;
+    class Crimes Group / preloadfmt order=data;
+    table 
+      /** Rows **/
+      year=' ' * crimes=' ',
+      /** Columns **/
+      sum=' ' * Exposure='Exposure to crimes \line (effective\~crime\~rate\~per\~1,000\~population)' * Group=' '
+    ;
+    format Crimes $crimes. Group $group.;
+  run;
+
+%mend table;
+
+
+%fdate()
+
+options nodate nonumber;
+options missing='-';
+
+ods rtf file="&_dcdata_default_path\DCOLA\Prog\SOIAA2018\Crime_exposure_SOIAA_2018.rtf" style=Styles.Rtf_arial_9pt;
+ods listing close;
+
+title1 "State of Immigrants Report, 2018";
+title2 "Crime Exposure";
+title3 " ";
+
+footnote1 height=9pt "Prepared by Urban-Greater DC (greaterdc.urban.org), &fdate..";
+footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\fs19\cf1{PAGE }\cf0\chcbpat0}}}';
+
+%table( select='latino' 'total' 'natborn' )
+%table( select='asianpi' 'total' 'natborn' )
+%table( select='african' 'total' 'natborn' )
+
+%table( select='black_nb' 'total' 'white_nb' )
 
 ods rtf close;
 ods listing;
+
