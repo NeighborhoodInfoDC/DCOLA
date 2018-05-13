@@ -30,6 +30,9 @@
   poverty rentgrs school sex speakeng yrimmig yrsusa1 yrsusa2
   trantime tranwork uhrswork valueh 
   ftotinc inctot incwelfr incwage incbus00 incinvst incretir;
+  
+%let ipums_keep_fam =
+  is_: ;
 
 proc format;
   value $upuma2000_to_met2013f
@@ -72,11 +75,34 @@ proc format;
     other = ' ';
 run;
 
+data Ipums_2000_dc_w_fam;
+
+  merge
+    Ipums.Ipums_2000_dc (in=in1)
+    Ipums.Ipums_2000_fam_pmsa99 (keep=serial &ipums_keep_fam);
+  by serial;
+  
+  if in1;
+  
+run;
+  
+data Acs_2012_16_dc_w_fam;
+
+  merge
+    Ipums.Acs_2012_16_dc (in=in1)
+    Ipums.Acs_2012_16_fam_pmsa99 (keep=serial &ipums_keep_fam);
+  by serial;
+  
+  if in1;
+  
+run;
+  
+
 data A;
 
   set
-    Ipums.Ipums_2000_dc
-      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b languagd educ99 ownershd 
+    Ipums_2000_dc_w_fam
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b &ipums_keep_fam languagd educ99 ownershd 
        rename=(languagd=languaged ownershd=ownershpd yrimmig=yrimmig00))
 
     Ipums.Ipums_2000_md
@@ -96,8 +122,8 @@ data A;
 
     Ipums.Acs_2011_15_dc                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
       (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged)
-    Ipums.Acs_2012_16_dc
-      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype)
+    Acs_2012_16_dc_w_fam
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b &ipums_keep_fam met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype)
 
     Ipums.Acs_2011_15_md                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
       (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged
@@ -328,6 +354,25 @@ data Ipums_SOIAA_2018;
   
   if yrimmig = 0 then yrimmig = .n;
   
+  ** Custom HH types **;
+  
+  if is_family = 1 then do;
+    if is_sfemwkids = 1  then newhhtype = 1; /** Single woman-headed family with related children**/
+    else if is_sngfem = 1 then newhhtype = 2; /**Single woman-headed household without related children **/
+    else if is_smalwkids = 1 then newhhtype = 3; /** Single male-headed household with related children**/
+    else if is_sngmal = 1 then newhhtype = 4; /** Single male-headed household without related children**/
+    else if is_mrdwkids = 1 then newhhtype = 5; /**Married couple with related children**/
+    else if is_mrdnokid = 1 then newhhtype = 6; /**Married couple without related children**/
+  end;
+  else if is_family = 0 then do;
+    if numprec = 1 then newhhtype = 7;  /** Person living alone **/
+    else newhhtype = 8;  /** Other nonfamily households **/
+  end;
+  else do;
+    if gq in ( 1, 2, 5 ) then newhhtype = .u;  /** HH type unknown **/
+    else newhhtype = .n;  /** HH type not applicable (GQ pop) **/
+  end;
+  
   ** HUD income levels (2000) **;
   
   if year = 0 then do;
@@ -448,7 +493,8 @@ data Ipums_SOIAA_2018;
     incinvst_2016 = "Interest, dividend, and rental income ($ 2016)"
     incretir_2016 = "Retirement income ($ 2016)"
     incwelfr_2016 = "Welfare (public assistance) income ($ 2016)"
-    youth_disconnect = "Disconnected youth indicator";
+    youth_disconnect = "Disconnected youth indicator"
+    newhhtype = "Household type (Urban recode)";
 
   drop i;
 
@@ -462,7 +508,7 @@ run;
   label="DC State of Immigrants/African Americans report 2018, IPUMS",
   sortby=year serial pernum,
   printobs=5,
-  freqvars=hud_inc raceth youth_disconnect health_cov,
+  freqvars=hud_inc raceth newhhtype youth_disconnect health_cov,
   revisions=%str(New file.)
 )
 
@@ -495,6 +541,8 @@ proc freq data=Ipums_SOIAA_2018;
   tables immigrant_1gen * citizen / missing list;
   tables immigrant_1gen * aframerican * raced / missing list;
   tables raceth * hispand * raced / missing list;
+  tables newhhtype * is_family * is_mrdnokid * is_mrdwkids * is_sfemwkids * is_smalwkids * is_sngfem * is_sngmal 
+    / missing list nopercent nocum;
   format bpld bpld_a.;
 run;
 
