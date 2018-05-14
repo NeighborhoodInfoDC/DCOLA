@@ -501,7 +501,6 @@ data Ipums_SOIAA_2018;
 run;
 
 %Finalize_data_set( 
-  REGISTER_METADATA=N,
   data=Ipums_SOIAA_2018,
   out=Ipums_SOIAA_2018,
   outlib=DCOLA,
