@@ -36,13 +36,20 @@ proc format;
     2000 -< 2010 = "2000 - 2009"
     2010 - high = "2010 or later";
 
-  value raceth
+  value raceth (notsorted)
     1 = 'Black'
     2 = 'White'
     3 = 'Latino'
     4 = 'Asian/Pacific Islander'
-    5 = 'Other race'
+    5 = 'Other (Am. Ind., AK Nat., other race)'
     6 = 'Multiple races';
+    
+  value raced_a (notsorted)
+    200 = "Black"
+    100 = "White"
+    400-699 = "Asian/Pacific Islander"
+    other = "Other (Am. Ind., AK Nat., other race)"
+    801-990 = "Multiple races";
 
   value bpld_a (notsorted) 
     00100-12092, 71040-71050, 90000-90022 = 'US & territories'
@@ -234,11 +241,21 @@ proc format;
     4 = "Has public health insurance only"
     2 = "Has public and private health insurance";
     
+  value newhhtype (notsorted)
+    1 = "Single woman-headed family with related children"
+    2 = "Single woman-headed household without related children"
+    3 = "Single male-headed household with related children"
+    4 = "Single male-headed household without related children"
+    5 = "Married couple with related children"
+    6 = "Married couple without related children"
+    7 = "Person living alone"
+    8 = " Other nonfamily households";
+    
 run;
 
 /** Macro table - Start Definition **/
 
-%macro table( year1=0, year2=2016, order=data, pop=, poplbl=, by=, bylbl=, byfmt= );
+%macro table( year1=0, year2=2016, order=data, pop=, poplbl=, by=, bylbl=, byfmt=, rowstat=colpctsum=' ' * f=comma12.1 );
 
   proc tabulate data=Tables format=comma12.0 noseps missing;
     where year in ( &year1, &year2 ) and (&pop);
@@ -250,7 +267,7 @@ run;
       /** Rows **/
       (
         sum=&poplbl
-        &by=&bylbl * colpctsum=' ' * f=comma12.1
+        &by=&bylbl * &rowstat
       ),
       /** Columns **/
       total=' ' * year=' '
@@ -391,11 +408,15 @@ options missing='-';
 
     %table( pop=&pop1gen, poplbl="\b &lblpre", by=yrsusa2, byfmt=yrsusa2_f., bylbl="\i % Years in US" )
 
+    %table( pop=&pop1gen, poplbl="\b &lblpre", by=raced, byfmt=raced_a., bylbl="\i % Race (self-identified)" )
+
     %table( pop=&pop1gen, poplbl="\b &lblpre", by=raceth, byfmt=raceth., bylbl="\i % Race/ethnicity (self-identified)" )
     
   %end;
 
   %table( pop=&pop1gen, poplbl="\b &lblpre", by=age, byfmt=age_a., bylbl="\i % Age" )
+
+  %table( pop=&pop1gen, poplbl="\b &lblpre", by=age, byfmt=age_a., bylbl="\i Persons by age", rowstat=sum=' ' * f=comma12.0 )
 
   %table( pop=&pop2gen, poplbl="\b &lblpre (2nd gen)", by=age, byfmt=age_a., bylbl="\i % Age" )
 
@@ -403,7 +424,7 @@ options missing='-';
 
   %table( pop=&pop1gen and sex=1, poplbl="\b &lblpre, male", by=age, byfmt=age_a., bylbl="\i % Age" )
 
-  %table( year1=., pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=hhtype, byfmt=hhtype_f., bylbl="\i % Household type" )
+  %table( pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=newhhtype, byfmt=newhhtype., bylbl="\i % Household type" )
 
 
   title4 "\i Jobs and economic opportunity";
@@ -527,7 +548,7 @@ options missing='-';
 
 
 %All_tables( poppre=immigrant, lblpre=Immigrants, geo=dc )
-
+/*
 %All_tables( poppre=immigrant, lblpre=Immigrants, geo=suburbs )
 
 %All_tables( poppre=latino, lblpre=Latinos, geo=dc )
