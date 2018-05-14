@@ -548,7 +548,7 @@ options missing='-';
 
 
 %All_tables( poppre=immigrant, lblpre=Immigrants, geo=dc )
-/*
+
 %All_tables( poppre=immigrant, lblpre=Immigrants, geo=suburbs )
 
 %All_tables( poppre=latino, lblpre=Latinos, geo=dc )
