@@ -28,7 +28,7 @@ libname vitalraw 'L:\Libraries\Vital\Raw\2018';
 
 proc format;
   value black 
-    1 = 'African American'
+    1 = 'Black'
     2 = 'All others';
 
 data Deaths;
@@ -195,7 +195,7 @@ data Deaths;
     Deaths_hypert = 'Deaths from hypertensive diseases'
     Deaths_cereb = 'Deaths from cerebrovascular diseases'
     Deaths_liver = 'Deaths from liver diseases'
-    Deaths_respitry = 'Deaths from respitory diseases'
+    Deaths_respitry = 'Deaths from respiratory diseases'
     Deaths_oth_caus = 'Deaths from other causes'
     Deaths_w_cause = 'Deaths with cause reported';
   
@@ -295,13 +295,18 @@ footnote2 height=9pt j=r '{Page}\~{\field{\*\fldinst{\pard\b\i0\chcbpat8\qc\f1\f
 
 
 %Table( var=Total, label="All deaths" )
-%Table( var=Deaths_homicide, label="Deaths by homicide" )
-%Table( var=Deaths_suicide, label="Deaths by suicide" )
-%Table( var=Deaths_accident, label="Deaths by accident" )
-%Table( var=Deaths_violent, label="Deaths by violence" )
-%Table( var=Deaths_heart, label="Deaths by heart disease" )
-%Table( var=Deaths_cancer, label="Deaths by cancer" )
-
+%Table( var=Deaths_homicide, label="Deaths from homicide" )
+%Table( var=Deaths_suicide, label="Deaths from suicide" )
+%Table( var=Deaths_accident, label="Deaths from accident" )
+%Table( var=Deaths_violent, label="Deaths from violence" )
+%Table( var=Deaths_heart, label="Deaths from heart disease" )
+%Table( var=Deaths_cancer, label="Deaths from cancer" )
+%Table( var=Deaths_hiv, label="HIV related deaths" )
+%Table( var=Deaths_diabetes, label="Deaths from diabetes" )
+%Table( var=Deaths_hypert, label="Deaths from hypertensive diseases" )
+%Table( var=Deaths_cereb, label="Deaths from cerebrovascular diseases" )
+%Table( var=Deaths_liver, label="Deaths from liver diseases" )
+%Table( var=Deaths_respitry, label="Deaths from respiratory diseases" )
 
 ods rtf close;
 ods listing;
