@@ -177,7 +177,7 @@ quit;
 
 proc format;
   value bpld_a
-    00100-12092, 71040-71050, 90000-90022 = 'US & territories'
+    00100-10999, 11001-12092, 71040-71050, 90000-90022  = 'US & territories'
     15000-19900, 29900 = 'Canada & other North America'
     20000       = 'Mexico'
     21000-21090, 11000 = 'Central America'
