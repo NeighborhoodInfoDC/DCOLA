@@ -178,17 +178,18 @@ quit;
 proc format;
   value bpld_a
     00100-12092, 71040-71050, 90000-90022 = 'US & territories'
-    15000-19900, 29900, 29999 = 'Canada & other North America'
+    15000-19900, 29900 = 'Canada & other North America'
     20000       = 'Mexico'
-    21000-21090 = 'Central America'
-    25000-26095 = 'Caribbean'
+    21000-21090, 11000 = 'Central America'
+    25000, 26010, 26091, 29900  = 'Caribbean'
     30000-30091 = 'South America'
     40000-49900 = 'Europe'
-    50000-59900 = 'Asia'
+    50000, 50010, 50040, 50100, 50200, 51100, 51200, 51300, 51400, 51500, 51600, 51700
+    51800, 52100, 52110, 52120, 52130, 52140, 52150, 52400 = 'Asia'
     71000-71039 = 'Pacific Islands'
     60000-60099 = 'Africa'
     70000-70020 = 'Australia & New Zealand'
-    71090, 80000-80050 = 'Other non-US'
+    52000, 52200, 53100-59900, 71090, 80000-80050,26020-26060,26094  = 'Other non-US'
     95000-99900, . = 'Missing';
 run;    
 
