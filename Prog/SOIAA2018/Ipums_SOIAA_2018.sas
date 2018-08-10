@@ -510,7 +510,7 @@ run;
   sortby=year serial pernum,
   printobs=0,
   freqvars=hud_inc raceth newhhtype youth_disconnect health_cov,
-  revisions=%str(New file.)
+  revisions=%str(Fix country selections.)
 )
 
 proc freq data=Ipums_SOIAA_2018;
