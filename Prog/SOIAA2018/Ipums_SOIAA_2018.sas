@@ -175,6 +175,8 @@ proc sql noprint;
 quit;
 
 
+** Classification of countries into regions has been modified to conform to DC Mayor's offices populations **;
+
 proc format;
   value bpld_a
     00100-10999, 11001-12092, 71040-71050, 90000-90022  = 'US & territories'
@@ -184,12 +186,11 @@ proc format;
     25000, 26010, 26091, 29900  = 'Caribbean'
     30000-30091 = 'South America'
     40000-49900 = 'Europe'
-    50000, 50010, 50040, 50100, 50200, 51100, 51200, 51300, 51400, 51500, 51600, 51700,
-    51800, 52100, 52110, 52120, 52130, 52140, 52150, 52400 = 'Asia'
+    50000-51910, 52100-52150, 52400 = 'Asia'
     71000-71039 = 'Pacific Islands'
     60000-60099 = 'Africa'
     70000-70020 = 'Australia & New Zealand'
-    52000, 52200, 53100-59900, 71090, 80000-80050,26020-26060,26094  = 'Other non-US'
+    52000, 52200, 53100-59900, 71090, 80000-80050,26020-26060,26094,29999  = 'Other non-US'
     95000-99900, . = 'Missing';
 run;    
 
@@ -202,7 +203,7 @@ run;
   african_&suffix = 0;
   otherimm_&suffix = 0;
   
-  if &citizen in ( 2, 3 ) then do;
+  if &citizen in ( 0, 2, 3 ) then do;
   
     select ( put( &bpld, bpld_a. ) );
 
@@ -507,9 +508,9 @@ run;
   outlib=DCOLA,
   label="DC State of Immigrants/African Americans report 2018, IPUMS",
   sortby=year serial pernum,
-  printobs=5,
+  printobs=0,
   freqvars=hud_inc raceth newhhtype youth_disconnect health_cov,
-  revisions=%str(New file.)
+  revisions=%str(Fix country selections.)
 )
 
 proc freq data=Ipums_SOIAA_2018;
@@ -545,6 +546,31 @@ proc freq data=Ipums_SOIAA_2018;
     / missing list nopercent nocum;
   format bpld bpld_a.;
 run;
+
+** Places of birth by population group **;
+
+title2 'Latino population';
+
+proc freq data=Ipums_SOIAA_2018;
+  where statefip = 11 and latino_1gen;
+  tables bpld;
+run;
+
+title2 'Asian/PI population';
+
+proc freq data=Ipums_SOIAA_2018;
+  where statefip = 11 and asianpi_1gen;
+  tables bpld;
+run;
+
+title2 'African population';
+
+proc freq data=Ipums_SOIAA_2018;
+  where statefip = 11 and african_1gen;
+  tables bpld;
+run;
+
+title2;
 
 proc format;
   value educ99_b
