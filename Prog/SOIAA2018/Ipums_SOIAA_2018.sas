@@ -121,7 +121,7 @@ data A;
        where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
 
     Ipums.Acs_2011_15_dc                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged)
+      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged hcov:)
     Acs_2012_16_dc_w_fam
       (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b &ipums_keep_fam met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype)
 
@@ -519,7 +519,7 @@ run;
   sortby=year serial pernum,
   printobs=0,
   freqvars=hud_inc raceth newhhtype youth_disconnect health_cov,
-  revisions=%str(Add social security income.)
+  revisions=%str(Add health insurance coverage to 2011-15 data.)
 )
 
 proc freq data=Ipums_SOIAA_2018;
