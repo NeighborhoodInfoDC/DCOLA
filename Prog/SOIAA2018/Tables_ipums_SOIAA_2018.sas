@@ -241,6 +241,10 @@ proc format;
     4 = "Has public health insurance only"
     2 = "Has public and private health insurance";
     
+  value health_covb (notsorted)
+    1 = "No health insurance"
+    3,4,2 = "Has health insurance";
+  
   value newhhtype (notsorted)
     1 = "Single woman-headed family with related children"
     2 = "Single woman-headed household without related children"
@@ -793,11 +797,11 @@ run;
 
 /** Macro table - Start Definition **/
 
-%macro table( year1=0, year2=2016, order=data, pop=, poplbl=, by=, bylbl=, byfmt=, rowstat=colpctsum=' ' * f=comma12.1 );
+%macro table( year1=0, year2=2016, order=data, pop=, poplbl=, colby=year, colbyfmt=yeartbl., by=, bylbl=, byfmt=, rowstat=colpctsum=' ' * f=comma12.1 );
 
   proc tabulate data=Tables format=comma12.0 noseps missing;
     where year in ( &year1, &year2 ) and (&pop);
-    class year;
+    class &colby / preloadfmt order=data;
     class &by / preloadfmt order=&order;
     var total;
     weight perwt;
@@ -808,10 +812,15 @@ run;
         &by=&bylbl * &rowstat
       ),
       /** Columns **/
-      total=' ' * year=' '
+      %if %lowcase( &colby ) = year %then %do;
+        total=' ' * &colby=' '
+      %end;
+      %else %do;
+        total=' ' * ( all='Total' &colby=' ' )
+      %end;
       / rts=60
     ;
-    format year yeartbl. &by &byfmt;
+    format &colby &colbyfmt &by &byfmt;
   run;
 
 %mend table;
@@ -989,9 +998,17 @@ options missing='-';
 
   %table( pop=&pop1gen and age >= 16 and incinvst_2016 ~= 0, poplbl="\b &lblpre, 16+ years old with investment income", by=incinvst_2016, byfmt=incbus_a., bylbl="\i % Annual investment income ($ 2016)" )
 
-  %table( pop=&pop1gen and age >= 65, poplbl="\b &lblpre, 65+ years old", by=incretir_2016, byfmt=incwwo., bylbl="\i % With retirement income" )
+  %table( pop=&pop1gen and age >= 65, poplbl="\b &lblpre, 65+ years old", by=incretir_2016, byfmt=incwwo., bylbl="\i % With retirement income, excluding Social Security" )
 
-  %table( pop=&pop1gen and age >= 65 and incretir_2016 ~= 0, poplbl="\b &lblpre, 65+ years old with retirement income", by=incretir_2016, byfmt=incwage_a., bylbl="\i % Annual retirement income ($ 2016)" )
+  %table( pop=&pop1gen and age >= 65, poplbl="\b &lblpre, 65+ years old", by=incss_2016, byfmt=incwwo., bylbl="\i % With Social Security income" )
+
+  %table( pop=&pop1gen and age >= 65, poplbl="\b &lblpre, 65+ years old", by=incretirss_2016, byfmt=incwwo., bylbl="\i % With retirement income, including Social Security" )
+
+  %table( pop=&pop1gen and age >= 65 and incretir_2016 ~= 0, poplbl="\b &lblpre, 65+ years old with retirement income, excluding Social Security", by=incretir_2016, byfmt=incwage_a., bylbl="\i % Annual retirement income w/o SS ($ 2016)" )
+
+  %table( pop=&pop1gen and age >= 65 and incss_2016 ~= 0, poplbl="\b &lblpre, 65+ years old with Social Security income", by=incss_2016, byfmt=incwage_a., bylbl="\i % Annual Social Security income ($ 2016)" )
+
+  %table( pop=&pop1gen and age >= 65 and incretirss_2016 ~= 0, poplbl="\b &lblpre, 65+ years old with retirement income, including Social Security", by=incretirss_2016, byfmt=incwage_a., bylbl="\i % Annual retirement income with SS ($ 2016)" )
 
 
   title4 "\i Housing";
@@ -1017,7 +1034,34 @@ options missing='-';
 
   %table( year1=., pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=foodstmp, byfmt=foodstmp_f., bylbl="\i % With SNAP (food stamp) benefits" )
 
+
   %table( year1=., pop=&pop1gen, poplbl="\b &lblpre", by=health_cov, byfmt=health_cov., bylbl="\i % With health insurance coverage" )
+
+  %if &poppre ~= aframerican and &poppre ~= total %then %do;
+  
+    %if &poppre = immigrant %then %do;
+
+      %table( year1=., pop=&pop1gen, poplbl="\b &lblpre, 2012-16", colby=health_cov, colbyfmt=health_covb., by=bpld, byfmt=bpld_a., bylbl="\i % Country of origin" )
+      
+    %end;
+    %else %do;
+    
+      %table( year1=., order=freq, pop=&pop1gen, poplbl="\b &lblpre, 2012-16", colby=health_cov, colbyfmt=health_covb., by=bpld, byfmt=bpld_f., bylbl="\i % Country of origin" )
+      
+    %end;
+    
+    %table( year1=., pop=&pop1gen and age >= 5, poplbl="\b &lblpre, 5+ years old", colby=health_cov, colbyfmt=health_covb., 
+            by=speakeng, byfmt=speakeng_f., bylbl="\i % English proficiency" )
+
+  %end;
+
+  %table( year1=., pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters, 2012-16", colby=health_cov, colbyfmt=health_covb., 
+          by=hhincome_2016, byfmt=incwage_a., bylbl="\i % Household income ($ 2016)" )
+
+  %table( year1=., pop=&pop1gen, poplbl="\b &lblpre, 2012-16", colby=health_cov, colbyfmt=health_covb., by=age, byfmt=age_a., bylbl="\i % Age" )
+
+  %table( year1=., pop=&pop1gen, poplbl="\b &lblpre, 2012-16", colby=health_cov, colbyfmt=health_covb., by=sex, byfmt=sex_f., bylbl="\i % Sex" )
+
 
   %table( year1=., pop=&pop2gen, poplbl="\b &lblpre (2nd gen)", by=health_cov, byfmt=health_cov., bylbl="\i % With health insurance coverage" )
 

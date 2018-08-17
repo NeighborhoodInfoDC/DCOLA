@@ -29,7 +29,7 @@
   numprec hhincome diff: empstatd gradeatt ind occ labforce 
   poverty rentgrs school sex speakeng yrimmig yrsusa1 yrsusa2
   trantime tranwork uhrswork valueh 
-  ftotinc inctot incwelfr incwage incbus00 incinvst incretir;
+  ftotinc inctot incwelfr incwage incbus00 incinvst incretir incss;
   
 %let ipums_keep_fam =
   is_: ;
@@ -121,26 +121,26 @@ data A;
        where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
 
     Ipums.Acs_2011_15_dc                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged)
+      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged hcov:)
     Acs_2012_16_dc_w_fam
       (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b &ipums_keep_fam met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype)
 
     Ipums.Acs_2011_15_md                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged
+      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged hcov:
        where=(met2013=47900))
     Ipums.Acs_2012_16_md
       (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
        where=(met2013=47900))
 
     Ipums.Acs_2011_15_va                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged
+      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged hcov:
        where=(met2013=47900))
     Ipums.Acs_2012_16_va
       (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
        where=(met2013=47900))
 
     Ipums.Acs_2011_15_wv                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged
+      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged hcov:
        where=(upuma='5400400'))
     Ipums.Acs_2012_16_wv
       (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
@@ -299,6 +299,7 @@ data Ipums_SOIAA_2018;
     end;
   
     if incwelfr = 99999 then incwelfr = .n;
+    if incss = 99999 then incss = .n;
     
   end;
   
@@ -312,6 +313,7 @@ data Ipums_SOIAA_2018;
     %dollar_convert( incbus00, incbus00_2016, 1999, 2016 )
     %dollar_convert( incinvst, incinvst_2016, 1999, 2016 )
     %dollar_convert( incretir, incretir_2016, 1999, 2016 )
+    %dollar_convert( incss, incss_2016, 1999, 2016 )
     %dollar_convert( incwelfr, incwelfr_2016, 1999, 2016 )
   end;
   else if year = 2016 then do;
@@ -322,8 +324,13 @@ data Ipums_SOIAA_2018;
     incbus00_2016 = incbus00;
     incinvst_2016 = incinvst;
     incretir_2016 = incretir;
+    incss_2016 = incss;
     incwelfr_2016 = incwelfr;
   end;
+  
+  ** Create summary retirement + SS var **;
+  
+  incretirss_2016 = sum( incretir_2016, incss_2016 );
 
   ** Race/ethnicity **;
   
@@ -493,7 +500,9 @@ data Ipums_SOIAA_2018;
     incwage_2016 = "Wage and salary income ($ 2016)"
     incbus00_2016 = "Business and farm income ($ 2016)"
     incinvst_2016 = "Interest, dividend, and rental income ($ 2016)"
-    incretir_2016 = "Retirement income ($ 2016)"
+    incretir_2016 = "Retirement income (w/o Social Security) ($ 2016)"
+    incss_2016 = "Social Security income ($ 2016)"
+    incretirss_2016 = "Retirement income with Social Security ($ 2016)"
     incwelfr_2016 = "Welfare (public assistance) income ($ 2016)"
     youth_disconnect = "Disconnected youth indicator"
     newhhtype = "Household type (Urban recode)";
@@ -510,7 +519,7 @@ run;
   sortby=year serial pernum,
   printobs=0,
   freqvars=hud_inc raceth newhhtype youth_disconnect health_cov,
-  revisions=%str(Fix country selections.)
+  revisions=%str(Add health insurance coverage to 2011-15 data for MD, VA, WV.)
 )
 
 proc freq data=Ipums_SOIAA_2018;
