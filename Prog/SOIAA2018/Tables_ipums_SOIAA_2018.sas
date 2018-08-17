@@ -1050,7 +1050,7 @@ options missing='-';
       
     %end;
     
-    %table( year1=., year2=2015, pop=&pop1gen and age >= 5, poplbl="\b &lblpre, 5+ years old, 2011-15", colby=health_cov, colbyfmt=health_covb., 
+    %table( year1=., pop=&pop1gen and age >= 5, poplbl="\b &lblpre, 5+ years old", colby=health_cov, colbyfmt=health_covb., 
             by=speakeng, byfmt=speakeng_f., bylbl="\i % English proficiency" )
 
   %end;
