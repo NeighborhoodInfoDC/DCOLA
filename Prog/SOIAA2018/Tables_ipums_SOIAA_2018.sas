@@ -801,7 +801,8 @@ run;
 
   proc tabulate data=Tables format=comma12.0 noseps missing;
     where year in ( &year1, &year2 ) and (&pop);
-    class &colby &by / preloadfmt order=&order;
+    class &colby / preloadfmt order=data;
+    class &by / preloadfmt order=&order;
     var total;
     weight perwt;
     table 
