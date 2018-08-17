@@ -989,9 +989,17 @@ options missing='-';
 
   %table( pop=&pop1gen and age >= 16 and incinvst_2016 ~= 0, poplbl="\b &lblpre, 16+ years old with investment income", by=incinvst_2016, byfmt=incbus_a., bylbl="\i % Annual investment income ($ 2016)" )
 
-  %table( pop=&pop1gen and age >= 65, poplbl="\b &lblpre, 65+ years old", by=incretir_2016, byfmt=incwwo., bylbl="\i % With retirement income" )
+  %table( pop=&pop1gen and age >= 65, poplbl="\b &lblpre, 65+ years old", by=incretir_2016, byfmt=incwwo., bylbl="\i % With retirement income, excluding Social Security" )
 
-  %table( pop=&pop1gen and age >= 65 and incretir_2016 ~= 0, poplbl="\b &lblpre, 65+ years old with retirement income", by=incretir_2016, byfmt=incwage_a., bylbl="\i % Annual retirement income ($ 2016)" )
+  %table( pop=&pop1gen and age >= 65, poplbl="\b &lblpre, 65+ years old", by=incss_2016, byfmt=incwwo., bylbl="\i % With Social Security income" )
+
+  %table( pop=&pop1gen and age >= 65, poplbl="\b &lblpre, 65+ years old", by=incretirss_2016, byfmt=incwwo., bylbl="\i % With retirement income, including Social Security" )
+
+  %table( pop=&pop1gen and age >= 65 and incretir_2016 ~= 0, poplbl="\b &lblpre, 65+ years old with retirement income, excluding Social Security", by=incretir_2016, byfmt=incwage_a., bylbl="\i % Annual retirement income w/o SS ($ 2016)" )
+
+  %table( pop=&pop1gen and age >= 65 and incss_2016 ~= 0, poplbl="\b &lblpre, 65+ years old with Social Security income", by=incss_2016, byfmt=incwage_a., bylbl="\i % Annual Social Security income ($ 2016)" )
+
+  %table( pop=&pop1gen and age >= 65 and incretirss_2016 ~= 0, poplbl="\b &lblpre, 65+ years old with retirement income, including Social Security", by=incretirss_2016, byfmt=incwage_a., bylbl="\i % Annual retirement income with SS ($ 2016)" )
 
 
   title4 "\i Housing";
