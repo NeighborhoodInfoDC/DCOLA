@@ -299,6 +299,7 @@ data Ipums_SOIAA_2018;
     end;
   
     if incwelfr = 99999 then incwelfr = .n;
+    if incss = 99999 then incss = .n;
     
   end;
   
@@ -312,6 +313,7 @@ data Ipums_SOIAA_2018;
     %dollar_convert( incbus00, incbus00_2016, 1999, 2016 )
     %dollar_convert( incinvst, incinvst_2016, 1999, 2016 )
     %dollar_convert( incretir, incretir_2016, 1999, 2016 )
+    %dollar_convert( incss, incss_2016, 1999, 2016 )
     %dollar_convert( incwelfr, incwelfr_2016, 1999, 2016 )
   end;
   else if year = 2016 then do;
@@ -322,8 +324,13 @@ data Ipums_SOIAA_2018;
     incbus00_2016 = incbus00;
     incinvst_2016 = incinvst;
     incretir_2016 = incretir;
+    incss_2016 = incss;
     incwelfr_2016 = incwelfr;
   end;
+  
+  ** Create summary retirement + SS var **;
+  
+  incretirss_2016 = sum( incretir_2016, incss_2016 );
 
   ** Race/ethnicity **;
   
@@ -493,7 +500,9 @@ data Ipums_SOIAA_2018;
     incwage_2016 = "Wage and salary income ($ 2016)"
     incbus00_2016 = "Business and farm income ($ 2016)"
     incinvst_2016 = "Interest, dividend, and rental income ($ 2016)"
-    incretir_2016 = "Retirement income ($ 2016)"
+    incretir_2016 = "Retirement income (w/o Social Security) ($ 2016)"
+    incss_2016 = "Social Security income ($ 2016)"
+    incretirss_2016 = "Retirement income with Social Security ($ 2016)"
     incwelfr_2016 = "Welfare (public assistance) income ($ 2016)"
     youth_disconnect = "Disconnected youth indicator"
     newhhtype = "Household type (Urban recode)";
@@ -510,7 +519,7 @@ run;
   sortby=year serial pernum,
   printobs=0,
   freqvars=hud_inc raceth newhhtype youth_disconnect health_cov,
-  revisions=%str(Add social security income (INCSS).)
+  revisions=%str(Add social security income.)
 )
 
 proc freq data=Ipums_SOIAA_2018;
