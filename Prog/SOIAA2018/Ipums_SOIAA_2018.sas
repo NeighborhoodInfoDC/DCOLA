@@ -29,7 +29,7 @@
   numprec hhincome diff: empstatd gradeatt ind occ labforce 
   poverty rentgrs school sex speakeng yrimmig yrsusa1 yrsusa2
   trantime tranwork uhrswork valueh 
-  ftotinc inctot incwelfr incwage incbus00 incinvst incretir;
+  ftotinc inctot incwelfr incwage incbus00 incinvst incretir incss;
   
 %let ipums_keep_fam =
   is_: ;
