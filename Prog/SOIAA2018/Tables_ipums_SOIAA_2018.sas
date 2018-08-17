@@ -1050,6 +1050,9 @@ options missing='-';
       
     %end;
     
+    %table( year1=., year2=2015, pop=&pop1gen and age >= 5, poplbl="\b &lblpre, 5+ years old, 2011-15", colby=health_cov, colbyfmt=health_covb., 
+            by=speakeng, byfmt=speakeng_f., bylbl="\i % English proficiency" )
+
   %end;
 
   %table( year1=., pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters, 2012-16", colby=health_cov, colbyfmt=health_covb., 
@@ -1058,9 +1061,6 @@ options missing='-';
   %table( year1=., pop=&pop1gen, poplbl="\b &lblpre, 2012-16", colby=health_cov, colbyfmt=health_covb., by=age, byfmt=age_a., bylbl="\i % Age" )
 
   %table( year1=., pop=&pop1gen, poplbl="\b &lblpre, 2012-16", colby=health_cov, colbyfmt=health_covb., by=sex, byfmt=sex_f., bylbl="\i % Sex" )
-
-  %table( year1=., year2=2015, pop=&pop1gen and age >= 5, poplbl="\b &lblpre, 5+ years old, 2011-15", colby=health_cov, colbyfmt=health_covb., 
-          by=speakeng, byfmt=speakeng_f., bylbl="\i % English proficiency" )
 
 
   %table( year1=., pop=&pop2gen, poplbl="\b &lblpre (2nd gen)", by=health_cov, byfmt=health_cov., bylbl="\i % With health insurance coverage" )
