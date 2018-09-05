@@ -1117,6 +1117,11 @@ options missing='-';
 
   %table( pop=&pop1gen and 3 <= age < 18 and educ99 < 10 and gradeatt = 0, poplbl="\b &lblpre, 3-17 years old not HS graduate and not in school", by=age, byfmt=age_f., bylbl="\i % Age" )
 
+
+  %table( pop=&pop2gen and 3 <= age < 18, poplbl="\b &lblpre (2nd gen), 3-17 years old", by=age, byfmt=age_b., bylbl="\i % Age" )
+
+  %table( pop=&pop2gen and 3 <= age < 18, poplbl="\b &lblpre (2nd gen), 3-17 years old", by=age, byfmt=age_b., bylbl="\i Children by age", rowstat=sum=' ' * f=comma12.0 )
+
   %table( pop=&pop2gen and 3 <= age < 18 and educ99 < 10, poplbl="\b &lblpre (2nd gen), 3-17 years old not HS graduate", by=gradeatt, byfmt=gradeatt_a., bylbl="\i % School attendance" )
 
   %table( pop=&pop2gen and 3 <= age < 18 and educ99 < 10 and gradeatt = 0, poplbl="\b &lblpre (2nd gen), 3-17 years old not HS graduate and not in school", by=age, byfmt=age_f., bylbl="\i % Age" )
