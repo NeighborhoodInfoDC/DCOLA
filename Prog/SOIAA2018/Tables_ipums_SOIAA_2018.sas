@@ -82,6 +82,14 @@ proc format;
     65 -< 75 = '65 - 74'
     75 - high = '75 or older';
     
+  value age_b (notsorted)
+    0 -< 5 = 'Under 5'
+    5 -< 6 = '5'
+    6 -< 10 = '6 - 9'
+    10 -< 14 = '10 - 13'
+    14 -< 18 = '14 - 17'
+    18 - high = '18 or older';
+    
   value empstatd_a (notsorted)
     10, 12 = "At work/has job"
     14, 15 = "In armed forces"
@@ -1100,6 +1108,10 @@ options missing='-';
   title4 "\i Education";
 
   %table( pop=&pop1gen and age >= 18, poplbl="\b &lblpre, 18+ years old", by=educ99, byfmt=educ99_b., bylbl="\i % Highest level of education" )
+
+  %table( pop=&pop1gen and 3 <= age < 18, poplbl="\b &lblpre, 3-17 years old", by=age, byfmt=age_b., bylbl="\i % Age" )
+
+  %table( pop=&pop1gen and 3 <= age < 18, poplbl="\b &lblpre, 3-17 years old", by=age, byfmt=age_b., bylbl="\i Children by age", rowstat=sum=' ' * f=comma12.0 )
 
   %table( pop=&pop1gen and 3 <= age < 18 and educ99 < 10, poplbl="\b &lblpre, 3-17 years old not HS graduate", by=gradeatt, byfmt=gradeatt_a., bylbl="\i % School attendance" )
 
