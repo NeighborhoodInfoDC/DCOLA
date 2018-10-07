@@ -23,6 +23,7 @@ proc format;
 
   value yeartbl
     0 = '2000'
+    5,6,2007,2008,2009 = '2005-09'
     2015 = '2011-15'
     2016 = '2012-16';
     
@@ -1031,7 +1032,7 @@ options missing='-';
 
   %table( pop=&pop1gen and gq in ( 1, 2, 5 ), poplbl="\b &lblpre, not living in group quarters", by=hud_inc, byfmt=hudinc., bylbl="\i % HUD income level" )
 
-  %table( pop=&pop1gen and not( missing( Rent_burden ) ), poplbl="\b &lblpre, renters with cash rent", by=Rent_burden, byfmt=Rent_burden., bylbl="\i % Income spent on rent" )
+  %table( year1=%str( 5, 6, 2007, 2008, 2009 ), pop=&pop1gen and not( missing( Rent_burden ) ), poplbl="\b &lblpre, renters with cash rent", by=Rent_burden, byfmt=Rent_burden., bylbl="\i % Income spent on rent" )
   
   
   title4 "\i Health and human services";

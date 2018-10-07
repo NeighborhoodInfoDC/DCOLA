@@ -75,6 +75,91 @@ proc format;
     other = ' ';
 run;
 
+** Compile 2005-09 5-year data and calculate weights **;
+
+data a2005_09;
+
+  set 
+    Ipums.ACS_2005_dc (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2005_md (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2005_va (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2005_wv (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2006_dc (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2006_md (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2006_va (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2006_wv (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2007_dc (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2007_md (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2007_va (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2007_wv (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2008_dc (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2008_md (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2008_va (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2008_wv (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2009_dc (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2009_md (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2009_va (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2009_wv (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+  ;
+  
+run;
+
+proc sort data=a2005_09;
+  by upuma year;
+run;
+
+proc summary data=a2005_09;
+  var perwt hhwt;
+  by upuma year;
+  output out=a2005_09_sumwts (drop=_type_ _freq_) sum=perwt_sum hhwt_sum;
+run;
+
+proc summary data=a2005_09;
+  where year = 2009;
+  var perwt hhwt;
+  by upuma;
+  output out=a2005_09_sumwts09 (drop=_type_ _freq_) sum=perwt_sum09 hhwt_sum09;
+run;
+
+data a2005_09_allsumwts;
+
+  merge a2005_09_sumwts a2005_09_sumwts09;
+  by upuma;
+  
+run;
+
+data a2005_09_5yrwts;
+
+  merge a2005_09 a2005_09_allsumwts;
+  by upuma year;
+  
+  hhwt_new = ( ( hhwt_sum09 / hhwt_sum ) * hhwt ) / 5;
+  perwt_new = ( ( perwt_sum09 / perwt_sum ) * perwt ) / 5;
+
+  rename 
+    hhwt_new = hhwt
+    perwt_new = perwt
+    hhwt = hhwt_old
+    perwt = perwt_old;
+
+run;
+
+proc tabulate data=a2005_09_5yrwts format=comma12.0 noseps missing;
+  var perwt hhwt;
+  class statefip;
+  table 
+    /** Rows **/
+    all='Region' statefip=' ',
+    /** Columns **/
+    sum=' ' * ( perwt hhwt )
+  ;
+  title2 'Readjusted 2005-09 5-year pop and HH wts';
+run;
+
+title2;
+
+** Merge HH/family characteristics for 2000 and 2012-16 **;
+
 data Ipums_2000_dc_w_fam;
 
   merge
@@ -119,6 +204,8 @@ data A;
       (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b languagd educ99 ownershd 
        rename=(languagd=languaged ownershd=ownershpd yrimmig=yrimmig00)
        where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+       
+    a2005_09_5yrwts (/*OBS=100*/)
 
     Ipums.Acs_2011_15_dc                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
       (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged hcov:)
@@ -390,7 +477,7 @@ data Ipums_SOIAA_2018;
   
   ** Rent burden **;
   
-  if ownershpd = 22 and hhincome > 0 then Rent_burden = 100 * rentgrs / ( hhincome / 12 );
+  if year ~= 0 and ownershpd = 22 and hhincome > 0 then Rent_burden = 100 * rentgrs / ( hhincome / 12 );
   
   ** Education **;
   
@@ -505,7 +592,8 @@ data Ipums_SOIAA_2018;
     incretirss_2016 = "Retirement income with Social Security ($ 2016)"
     incwelfr_2016 = "Welfare (public assistance) income ($ 2016)"
     youth_disconnect = "Disconnected youth indicator"
-    newhhtype = "Household type (Urban recode)";
+    newhhtype = "Household type (Urban recode)"
+    health_cov = "Health insurance coverage (Urban recode)";
 
   drop i;
 
@@ -519,7 +607,7 @@ run;
   sortby=year serial pernum,
   printobs=0,
   freqvars=hud_inc raceth newhhtype youth_disconnect health_cov,
-  revisions=%str(Add health insurance coverage to 2011-15 data for MD, VA, WV.)
+  revisions=%str(Add OWNERSHPD for 2005-09 data.)
 )
 
 proc freq data=Ipums_SOIAA_2018;
