@@ -80,26 +80,26 @@ run;
 data a2005_09;
 
   set 
-    Ipums.ACS_2005_dc (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2005_md (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2005_va (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2005_wv (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2006_dc (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2006_md (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2006_va (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2006_wv (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2007_dc (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2007_md (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2007_va (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2007_wv (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2008_dc (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2008_md (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2008_va (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2008_wv (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2009_dc (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2009_md (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2009_va (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
-    Ipums.ACS_2009_wv (keep=&ipums_keep_a &ipums_keep_b where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2005_dc (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2005_md (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2005_va (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2005_wv (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2006_dc (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2006_md (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2006_va (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2006_wv (keep=&ipums_keep_a &ipums_keep_b ownershd rename=(ownershd=ownershpd) where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2007_dc (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2007_md (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2007_va (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2007_wv (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2008_dc (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2008_md (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2008_va (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2008_wv (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2009_dc (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2009_md (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2009_va (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
+    Ipums.ACS_2009_wv (keep=&ipums_keep_a &ipums_keep_b ownershpd where=(put(upuma,$upuma2000_to_met2013f.)='47900'))
   ;
   
 run;
@@ -592,7 +592,8 @@ data Ipums_SOIAA_2018;
     incretirss_2016 = "Retirement income with Social Security ($ 2016)"
     incwelfr_2016 = "Welfare (public assistance) income ($ 2016)"
     youth_disconnect = "Disconnected youth indicator"
-    newhhtype = "Household type (Urban recode)";
+    newhhtype = "Household type (Urban recode)"
+    health_cov = "Health insurance coverage (Urban recode)";
 
   drop i;
 
@@ -606,7 +607,7 @@ run;
   sortby=year serial pernum,
   printobs=0,
   freqvars=hud_inc raceth newhhtype youth_disconnect health_cov,
-  revisions=%str(Add 2005-09 data for rent burden comparison.)
+  revisions=%str(Add OWNERSHPD for 2005-09 data.)
 )
 
 proc freq data=Ipums_SOIAA_2018;
