@@ -55,12 +55,12 @@ proc format;
   value bpld_a (notsorted) 
     00100-10999, 11510-12092, 71040-71050, 90000-90022  = 'US & territories'
     21000-21090 = 'Central America'
-    50000-51910, 52100-52150, 52400 = 'Asia'
     40000-49900 = 'Europe'
     60000-60099 = 'Africa'
+    50000-51910, 52100-52150, 52400 = 'Asia'
     30000-30091 = 'South America'
-    11000, 25000, 26010 = 'Caribbean (Latino)'  /** Puerto Rico, Cuba, Dominican Republic **/
     11500, 26020-26091, 26094 = 'Caribbean (non-Latino)'
+    11000, 25000, 26010 = 'Caribbean (Latino)'  /** Puerto Rico, Cuba, Dominican Republic **/
     20000       = 'Mexico'
     15000-19900 = 'Canada & other North America'
     /**52200, 53100-54400 = 'Middle East/Near East'**/
@@ -912,7 +912,7 @@ options missing='-';
         latino_1gen='Latinos' 
         asianpi_1gen='Asian/Pacific Islanders' 
         african_1gen='Africans' 
-        caribb_1gen='Caribbean'
+        caribb_1gen='Caribbean (non-Latino)'
         otherimm_1gen='Other immigrants',
         /** Columns **/
         sum='Persons' * year=' '
@@ -933,7 +933,7 @@ options missing='-';
         latino_2gen='Latinos' 
         asianpi_2gen='Asian/Pacific Islanders' 
         african_2gen='Africans' 
-        caribb_2gen='Caribbean'
+        caribb_2gen='Caribbean (non-Latino)'
         otherimm_2gen='Other immigrants',
         /** Columns **/
         sum='Persons' * year=' '
