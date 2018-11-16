@@ -621,7 +621,7 @@ run;
   sortby=year serial pernum,
   printobs=0,
   freqvars=hud_inc raceth newhhtype youth_disconnect health_cov,
-  revisions=%str(Add OWNERSHPD for 2005-09 data.)
+  revisions=%str(Add Caribbean pop vars.)
 )
 
 proc freq data=Ipums_SOIAA_2018;
