@@ -53,26 +53,25 @@ proc format;
     801-990 = "Multiple races";
 
   value bpld_a (notsorted) 
-    00100-12092, 71040-71050, 90000-90022 = 'US & territories'
+    00100-10999, 11510-12092, 71040-71050, 90000-90022  = 'US & territories'
     21000-21090 = 'Central America'
-    50000-59900 = 'Asia'
+    50000-51910, 52100-52150, 52400 = 'Asia'
     40000-49900 = 'Europe'
     60000-60099 = 'Africa'
     30000-30091 = 'South America'
-    25000-26095 = 'Caribbean'
+    11000, 25000, 26010 = 'Caribbean (Latino)'  /** Puerto Rico, Cuba, Dominican Republic **/
+    11500, 26020-26091, 26094 = 'Caribbean (non-Latino)'
     20000       = 'Mexico'
-    15000-19900, 29900, 29999 = 'Canada & other North America'
-
+    15000-19900 = 'Canada & other North America'
+    /**52200, 53100-54400 = 'Middle East/Near East'**/
     /*
     71000-71039 = 'Pacific Islands'
     70000-70020 = 'Australia & New Zealand'
-    71090, 80000-80050 = 'Other non-US'
+    52000, 52200, 53100-54400, 59900, 71090, 80000-80050, 29900, 29999 = 'Other non-US'
     */
-
-    71000-71039, 70000-70020, 71090, 80000-80050 = 'Other non-US'
-
+    71000-71039, 70000-70020, 52000, 52200, 53100-54400, 59900, 71090, 80000-80050, 29900, 29999 = 'Other non-US'
     95000-99900, . = 'Missing';
-    
+
   value age_a
     0 -< 18 = 'Under 18'
     18 -< 25 = '18 - 24'
@@ -817,6 +816,7 @@ run;
     table 
       /** Rows **/
       (
+        n='\i Sample size'*[s=[font_style=italic]]
         sum=&poplbl
         &by=&bylbl * &rowstat
       ),
@@ -903,7 +903,7 @@ options missing='-';
     proc tabulate data=Tables format=comma12.0 noseps missing;
       where year in ( 0, 2016 );
       class year;
-      var total immigrant_1gen latino_1gen asianpi_1gen african_1gen otherimm_1gen;
+      var total immigrant_1gen latino_1gen asianpi_1gen african_1gen caribb_1gen otherimm_1gen;
       weight perwt;
       table 
         /** Rows **/
@@ -912,6 +912,7 @@ options missing='-';
         latino_1gen='Latinos' 
         asianpi_1gen='Asian/Pacific Islanders' 
         african_1gen='Africans' 
+        caribb_1gen='Caribbean'
         otherimm_1gen='Other immigrants',
         /** Columns **/
         sum='Persons' * year=' '
@@ -923,7 +924,7 @@ options missing='-';
     proc tabulate data=Tables format=comma12.0 noseps missing;
       where year in ( 0, 2016 ) and not( immigrant_1gen );
       class year;
-      var total immigrant_2gen latino_2gen asianpi_2gen african_2gen otherimm_2gen;
+      var total immigrant_2gen latino_2gen asianpi_2gen african_2gen caribb_2gen otherimm_2gen;
       weight perwt;
       table 
         /** Rows **/
@@ -932,6 +933,7 @@ options missing='-';
         latino_2gen='Latinos' 
         asianpi_2gen='Asian/Pacific Islanders' 
         african_2gen='Africans' 
+        caribb_2gen='Caribbean'
         otherimm_2gen='Other immigrants',
         /** Columns **/
         sum='Persons' * year=' '
@@ -1146,17 +1148,19 @@ options missing='-';
 
 /** End Macro Definition **/
 
-
 %All_tables( poppre=immigrant, lblpre=Immigrants, geo=dc )
 
 %All_tables( poppre=immigrant, lblpre=Immigrants, geo=suburbs )
 
+/*
 %All_tables( poppre=latino, lblpre=Latinos, geo=dc )
 
 %All_tables( poppre=asianpi, lblpre=Asians/Pacific Islanders, geo=dc )
 
 %All_tables( poppre=african, lblpre=Africans, geo=dc )
-
+*/
+%All_tables( poppre=caribb, lblpre=Caribbean people, geo=dc )
+/*
 %All_tables( poppre=aframerican, lblpre=African Americans, geo=dc )
 
 %All_tables( poppre=total, lblpre=Total population, geo=dc )
