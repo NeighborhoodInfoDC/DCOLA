@@ -135,7 +135,7 @@ data a2005_09_5yrwts;
   
   hhwt_new = ( ( hhwt_sum09 / hhwt_sum ) * hhwt ) / 5;
   perwt_new = ( ( perwt_sum09 / perwt_sum ) * perwt ) / 5;
-
+  
   rename 
     hhwt_new = hhwt
     perwt_new = perwt
@@ -208,29 +208,29 @@ data A;
     a2005_09_5yrwts (/*OBS=100*/)
 
     Ipums.Acs_2011_15_dc                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged hcov:)
+      (/*OBS=100*/ keep=&ipums_keep_a strata cluster met2013 languaged hcov:)
     Acs_2012_16_dc_w_fam
-      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b &ipums_keep_fam met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype)
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b &ipums_keep_fam strata cluster met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype)
 
     Ipums.Acs_2011_15_md                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged hcov:
+      (/*OBS=100*/ keep=&ipums_keep_a strata cluster met2013 languaged hcov:
        where=(met2013=47900))
     Ipums.Acs_2012_16_md
-      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b strata cluster met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
        where=(met2013=47900))
 
     Ipums.Acs_2011_15_va                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged hcov:
+      (/*OBS=100*/ keep=&ipums_keep_a strata cluster met2013 languaged hcov:
        where=(met2013=47900))
     Ipums.Acs_2012_16_va
-      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b strata cluster met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
        where=(met2013=47900))
 
     Ipums.Acs_2011_15_wv                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged hcov:
+      (/*OBS=100*/ keep=&ipums_keep_a strata cluster met2013 languaged hcov:
        where=(upuma='5400400'))
     Ipums.Acs_2012_16_wv
-      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b strata cluster met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
        where=(upuma='5400400'))
   ;
   
@@ -621,7 +621,7 @@ run;
   sortby=year serial pernum,
   printobs=0,
   freqvars=hud_inc raceth newhhtype youth_disconnect health_cov,
-  revisions=%str(Add Caribbean pop vars.)
+  revisions=%str(Add STRATA and CLUSTER vars for 2011 and later data.)
 )
 
 proc freq data=Ipums_SOIAA_2018;
