@@ -806,11 +806,16 @@ run;
 /** Macro table - Start Definition **/
 
 %macro table( year1=0, year2=2016, order=data, pop=, poplbl=, colby=year, colbyfmt=yeartbl., by=, bylbl=, byfmt=, rowstat=colpctsum=' ' * f=comma12.1 );
-
-  proc tabulate data=Tables format=comma12.0 noseps missing;
+/*test*/
+  proc surveyfreq data=Tables format=comma12.0 noseps missing;
     where year in ( &year1, &year2 ) and (&pop);
     class &colby / preloadfmt order=data;
     class &by / preloadfmt order=&order;
+	/*test*/
+	strata strata;
+	/*test*/
+    cluster cluster;
+
     var total;
     weight perwt;
     table 
@@ -900,11 +905,15 @@ options missing='-';
 
     title4 "\i Immmigrant population overview";
     
-    proc tabulate data=Tables format=comma12.0 noseps missing;
+	/*test*/
+    proc surveyfreq data=Tables format=comma12.0 noseps missing;
       where year in ( 0, 2016 );
       class year;
       var total immigrant_1gen latino_1gen asianpi_1gen african_1gen caribb_1gen otherimm_1gen;
       weight perwt;
+	  /*test*/
+	  strata strata;
+	  cluster cluster;
       table 
         /** Rows **/
         total='Total population' 
@@ -921,11 +930,15 @@ options missing='-';
       format year yeartbl.;
     run;
 
-    proc tabulate data=Tables format=comma12.0 noseps missing;
+	/*test*/
+    proc surveyfreq data=Tables format=comma12.0 noseps missing;
       where year in ( 0, 2016 ) and not( immigrant_1gen );
       class year;
       var total immigrant_2gen latino_2gen asianpi_2gen african_2gen caribb_2gen otherimm_2gen;
       weight perwt;
+	  /*test*/
+	  strata strata;
+	  cluster cluster;
       table 
         /** Rows **/
         total='Non-1gen immigrants' 
@@ -1164,4 +1177,5 @@ options missing='-';
 %All_tables( poppre=aframerican, lblpre=African Americans, geo=dc )
 
 %All_tables( poppre=total, lblpre=Total population, geo=dc )
+
 
