@@ -10,7 +10,7 @@
  Description:  Create IPUMS tables for DC State of Immigrants/African
  Americans report, 2018. 
 
- Modifications:
+ Modifications: 11/26/2018 Yipeng Su use surveyfreq to generate standard deviation for calculating MOE
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
@@ -807,28 +807,15 @@ run;
 
 %macro table( year1=0, year2=2016, order=data, pop=, poplbl=, colby=year, colbyfmt=yeartbl., by=, bylbl=, byfmt=, rowstat=colpctsum=' ' * f=comma12.1 );
 
-  proc tabulate data=Tables format=comma12.0 noseps missing;
+  proc surveyfreq data=Tables;
     where year in ( &year1, &year2 ) and (&pop);
-    class &colby / preloadfmt order=data;
-    class &by / preloadfmt order=&order;
-    var total;
+    **class &colby / preloadfmt order=data;
+    **class &by / preloadfmt order=&order;
+    **var total;
+	strata strata;
+    cluster cluster;
     weight perwt;
-    table 
-      /** Rows **/
-      (
-        n='\i Sample size'*[s=[font_style=italic]]
-        sum=&poplbl
-        &by=&bylbl * &rowstat
-      ),
-      /** Columns **/
-      %if %lowcase( &colby ) = year %then %do;
-        total=' ' * &colby=' '
-      %end;
-      %else %do;
-        total=' ' * ( all='Total' &colby=' ' )
-      %end;
-      / rts=60
-    ;
+    tables &colby * &by / cl;
     format &colby &colbyfmt &by &byfmt;
   run;
 
@@ -886,7 +873,7 @@ options missing='-';
 
   ods listing close;
 
-  ods rtf file="&_dcdata_default_path\DCOLA\Prog\SOIAA2018\Tables_ipums_SOIAA_2018_&poppre._&geo..rtf" style=Styles.Rtf_arial_9pt
+  ods rtf file="&_dcdata_default_path\DCOLA\Prog\SOIAA2018\Tables_ipums_SOIAA_2018_&poppre._&geo._moe.rtf" style=Styles.Rtf_arial_9pt
       /*bodytitle*/;
       
   title1 "State of Immigrants Report, 2018";

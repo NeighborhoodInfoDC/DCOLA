@@ -135,7 +135,7 @@ data a2005_09_5yrwts;
   
   hhwt_new = ( ( hhwt_sum09 / hhwt_sum ) * hhwt ) / 5;
   perwt_new = ( ( perwt_sum09 / perwt_sum ) * perwt ) / 5;
-
+  
   rename 
     hhwt_new = hhwt
     perwt_new = perwt
@@ -208,29 +208,29 @@ data A;
     a2005_09_5yrwts (/*OBS=100*/)
 
     Ipums.Acs_2011_15_dc                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged hcov:)
+      (/*OBS=100*/ keep=&ipums_keep_a strata cluster met2013 languaged hcov:)
     Acs_2012_16_dc_w_fam
-      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b &ipums_keep_fam met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype)
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b &ipums_keep_fam strata cluster met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype)
 
     Ipums.Acs_2011_15_md                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged hcov:
+      (/*OBS=100*/ keep=&ipums_keep_a strata cluster met2013 languaged hcov:
        where=(met2013=47900))
     Ipums.Acs_2012_16_md
-      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b strata cluster met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
        where=(met2013=47900))
 
     Ipums.Acs_2011_15_va                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged hcov:
+      (/*OBS=100*/ keep=&ipums_keep_a strata cluster met2013 languaged hcov:
        where=(met2013=47900))
     Ipums.Acs_2012_16_va
-      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b strata cluster met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
        where=(met2013=47900))
 
     Ipums.Acs_2011_15_wv                        /** Use 2011-15 for LANGUAGED until added to 2012-16 data **/
-      (/*OBS=100*/ keep=&ipums_keep_a met2013 languaged hcov:
+      (/*OBS=100*/ keep=&ipums_keep_a strata cluster met2013 languaged hcov:
        where=(upuma='5400400'))
     Ipums.Acs_2012_16_wv
-      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
+      (/*OBS=100*/ keep=&ipums_keep_a &ipums_keep_b strata cluster met2013 hud_inc hcov: educd foodstmp owncost ownershpd yrnatur hhtype
        where=(upuma='5400400'))
   ;
   
@@ -266,18 +266,20 @@ quit;
 
 proc format;
   value bpld_a
-    00100-10999, 11001-12092, 71040-71050, 90000-90022  = 'US & territories'
+    00100-10999, 11510-12092, 71040-71050, 90000-90022  = 'US & territories'
     15000-19900 = 'Canada & other North America'
     20000       = 'Mexico'
-    21000-21090, 11000 = 'Central America'
-    25000, 26010, 26091, 29900  = 'Caribbean'
+    21000-21090 = 'Central America'
+    11000, 25000, 26010 = 'Caribbean (Latino)'  /** Cuba, Dominican Republic **/
+    11500, 26020-26091, 26094 = 'Caribbean (non-Latino)'
     30000-30091 = 'South America'
     40000-49900 = 'Europe'
     50000-51910, 52100-52150, 52400 = 'Asia'
+    /**52200, 53100-54400 = 'Middle East/Near East'**/
     71000-71039 = 'Pacific Islands'
     60000-60099 = 'Africa'
     70000-70020 = 'Australia & New Zealand'
-    52000, 52200, 53100-59900, 71090, 80000-80050,26020-26060,26094,29999  = 'Other non-US'
+    52000, 52200, 53100-54400, 59900, 71090, 80000-80050, 29900, 29999 = 'Other non-US'
     95000-99900, . = 'Missing';
 run;    
 
@@ -288,6 +290,7 @@ run;
   latino_&suffix = 0;
   asianpi_&suffix = 0;
   african_&suffix = 0;
+  caribb_&suffix = 0;
   otherimm_&suffix = 0;
   
   if &citizen in ( 0, 2, 3 ) then do;
@@ -298,7 +301,7 @@ run;
         /** Nothing **/
       end;
 
-      when ( 'Mexico', 'Central America', 'Caribbean', 'South America' ) do;
+      when ( 'Mexico', 'Central America', 'Caribbean (Latino)', 'South America' ) do;
         latino_&suffix = 1;
       end;
 
@@ -309,7 +312,11 @@ run;
       when ( 'Africa' ) do;
         african_&suffix = 1;
       end;
-
+      
+      when ( 'Caribbean (non-Latino)' ) do;
+        caribb_&suffix = 1;
+      end;
+      
       when ( 'Canada & other North America', 'Europe', 'Australia & New Zealand', 'Other non-US' ) do;
         otherimm_&suffix = 1;
       end;
@@ -318,6 +325,7 @@ run;
         latino_&suffix = .;
         asianpi_&suffix = .;
         african_&suffix = .;
+        caribb_&suffix = .;
         otherimm_&suffix = .;
       end;
 
@@ -327,7 +335,7 @@ run;
 
     end;
 
-    immigrant_&suffix = max( latino_&suffix, asianpi_&suffix, african_&suffix, otherimm_&suffix );
+    immigrant_&suffix = max( latino_&suffix, asianpi_&suffix, african_&suffix, caribb_&suffix, otherimm_&suffix );
     
   end;
 
@@ -354,12 +362,14 @@ data Ipums_SOIAA_2018;
     latino_2gen = max( latino_mom, latino_pop );
     asianpi_2gen = max( asianpi_mom, asianpi_pop );
     african_2gen = max( african_mom, african_pop );
+    caribb_2gen = max( caribb_mom, caribb_pop );
     otherimm_2gen = max( otherimm_mom, otherimm_pop );
   end;
   else if not immigrant_2gen then do;
     latino_2gen = 0;
     asianpi_2gen = 0;
     african_2gen = 0;
+    caribb_2gen = 0;
     otherimm_2gen = 0;
   end;
 
@@ -561,21 +571,25 @@ data Ipums_SOIAA_2018;
     latino_1gen = "Latino (1st generation immigrant)"
     asianpi_1gen = "Asian/Pacific Islander (1st generation immigrant)"
     african_1gen = "African (1st generation immigrant)"
+    caribb_1gen = "Caribbean (non-Latino, 1st generation immigrant)"
     otherimm_1gen = "Other 1st generation immigrant"
     immigrant_mom = "Mother is 1st gen immigrant"
     latino_mom = "Mother is Latino 1st gen immigrant"
     asianpi_mom = "Mother is Asian/PI 1st gen immigrant"
     african_mom = "Mother is African 1st gen immigrant"
+    caribb_mom = "Mother is Caribbean non-Latino 1st gen immigrant"
     otherimm_mom = "Mother is other 1st gen immigrant"
     immigrant_pop = "Father is 1st gen immigrant"
     latino_pop = "Father is Latino 1st gen immigrant"
     asianpi_pop = "Father is Asian/PI 1st gen immigrant"
     african_pop = "Father is African 1st gen immigrant"
+    caribb_pop = "Father is Caribbean non-Latino 1st gen immigrant"
     otherimm_pop = "Father is other 1st gen immigrant"
     immigrant_2gen = "2nd generation immigrant"
     latino_2gen = "Latino (2nd generation immigrant)"
     asianpi_2gen = "Asian/Pacific Islander (2nd generation immigrant)"
     african_2gen = "African (2nd generation immigrant)"
+    caribb_2gen = "Caribbean (non-Latino, 2nd generation immigrant)"
     otherimm_2gen = "Other 2nd generation immigrant"
     aframerican = "African American"
     raceth = "Race/ethnicity"
@@ -607,7 +621,7 @@ run;
   sortby=year serial pernum,
   printobs=0,
   freqvars=hud_inc raceth newhhtype youth_disconnect health_cov,
-  revisions=%str(Add OWNERSHPD for 2005-09 data.)
+  revisions=%str(Add STRATA and CLUSTER vars for 2011 and later data.)
 )
 
 proc freq data=Ipums_SOIAA_2018;
@@ -664,6 +678,13 @@ title2 'African population';
 
 proc freq data=Ipums_SOIAA_2018;
   where statefip = 11 and african_1gen;
+  tables bpld;
+run;
+
+title2 'Caribbean population';
+
+proc freq data=Ipums_SOIAA_2018;
+  where statefip = 11 and caribb_1gen;
   tables bpld;
 run;
 
